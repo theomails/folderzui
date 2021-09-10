@@ -10,7 +10,7 @@ import java.util.Set;
 
 import javax.swing.JPanel;
 
-import net.progressit.folderzui.Scanner.FolderDetails;
+import net.progressit.folderzui.model.Scanner.FolderDetails;
 
 class DrawPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
@@ -34,7 +34,7 @@ class DrawPanel extends JPanel {
 		scale = height / total;
 		drawBox(0d, 0d, 50d, childHeight(details, scale), height(details, scale), fileName(details), g2d); // Root folder fills :)
 		int level = 1;
-		drawChildren(scale, 0, level, details.getChildren(), g2d);
+		drawChildren(scale, 0, level, details.getChildrenDetails(), g2d);
 	}
 
 	private void drawChildren(double scale, double startY, int level, Map<Path, FolderDetails> children,
@@ -46,8 +46,8 @@ class DrawPanel extends JPanel {
 			FolderDetails child = children.get(path);
 			double height = dbl(child.getFullSize()) * scale;
 			drawBox(x, y, 50d, childHeight(child, scale), height(child, scale), fileName(child), g2d);
-			if (!child.getChildren().isEmpty()) {
-				drawChildren(scale, y, level + 1, child.getChildren(), g2d);
+			if (!child.getChildrenDetails().isEmpty()) {
+				drawChildren(scale, y, level + 1, child.getChildrenDetails(), g2d);
 			}
 			y += height;
 		}

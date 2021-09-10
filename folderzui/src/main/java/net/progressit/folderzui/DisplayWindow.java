@@ -17,7 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import net.miginfocom.swing.MigLayout;
-import net.progressit.folderzui.Scanner.FolderDetails;
+import net.progressit.folderzui.model.Scanner;
+import net.progressit.folderzui.model.Scanner.FolderDetails;
 
 public class DisplayWindow extends JFrame {
 	private static final long serialVersionUID = 1L;

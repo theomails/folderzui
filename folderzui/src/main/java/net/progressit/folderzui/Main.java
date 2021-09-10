@@ -7,6 +7,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
+import net.progressit.folderzui.model.Scanner;
+
 public class Main {
 
 
