@@ -14,11 +14,22 @@ import net.progressit.folderzui.model.Scanner.FolderDetails;
 
 class DrawPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
+	
+	public static class DPRenderException extends Exception{
+		private static final long serialVersionUID = 1L;
+		public DPRenderException(String message, Exception sourceException) {
+			super(message, sourceException);
+		}
+	}
 
 	private FolderDetails details=null;
-	public void setDetails(FolderDetails details) {
-		this.details = details;
-		this.repaint();
+	public void setDetails(FolderDetails details) throws DPRenderException {
+		try {
+			this.details = details;
+			this.repaint();
+		}catch(RuntimeException e) {
+			throw new DPRenderException("Error while rendering the folder usage.", e);
+		}
 	}
 	
 	private double scale = 1d;

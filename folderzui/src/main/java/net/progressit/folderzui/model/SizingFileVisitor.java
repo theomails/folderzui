@@ -15,12 +15,13 @@ import lombok.Builder;
 import lombok.Data;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 
-class SizingFileVisitor implements FileVisitor<Path> {
+public class SizingFileVisitor implements FileVisitor<Path> {
 	public enum SFVProblemType {FINE, WARN, ERROR}
 	
 	@Data
 	public static class SFVFolderStartEvent{
 		private final Path folder;
+		private final FolderDetails folderDetails;
 	}
 	@Data
 	@Builder
@@ -54,10 +55,10 @@ class SizingFileVisitor implements FileVisitor<Path> {
 	private FolderDetails curDetails;
 	private final Map<Path, FolderDetails> allDetailsContainer;
 
-	public SizingFileVisitor(Path rootFolder, Object listener) {
+	public SizingFileVisitor(Path rootFolder, Map<Path, FolderDetails> allDetailsContainer, Object listener) {
 		eventBus.register(listener);
 		this.rootFolder = rootFolder;
-		this.allDetailsContainer = new HashMap<>();
+		this.allDetailsContainer = allDetailsContainer;
 	}
 
 	@Override
@@ -71,7 +72,7 @@ class SizingFileVisitor implements FileVisitor<Path> {
 		if (curDetails == null) {
 			curDetails = new FolderDetails(dir);
 			allDetailsContainer.put(dir, curDetails);
-			eventBus.post(new SFVFolderStartEvent(dir));
+			eventBus.post(new SFVFolderStartEvent(dir, curDetails));
 		}else {
 			eventBus.post(SFVProblemEvent.warn("Same folder visited again"));
 		}
@@ -118,7 +119,7 @@ class SizingFileVisitor implements FileVisitor<Path> {
 			curDetails = parentDetails;
 		}else {
 			FolderDetails rootFinalDetails = allDetailsContainer.get(dir);
-			rootFinalDetails.printNested( System.out );
+			//rootFinalDetails.printNested( System.out );
 			
 		}
 		eventBus.post(new SFVFolderEndEvent(dir));

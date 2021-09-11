@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
+import net.progressit.folderzui.DisplayWindow;
 
 public class Scanner {
 
@@ -19,6 +20,8 @@ public class Scanner {
 		private final Path path;
 		private long size = 0l;
 		private long fullSize = 0l;
+		private long count = 0l;
+		private long fullCount = 0l;
 		private final Map<String, Long> typeSizes = new HashMap<>();
 		private final Map<String, Long> typeFullSizes = new HashMap<>();
 		private final Map<Path, FolderDetails> childrenDetails = new LinkedHashMap<>();
@@ -39,6 +42,8 @@ public class Scanner {
 			}
 			size += addSize;
 			fullSize += addSize;
+			count++;
+			fullCount++;
 			safeAdd(extn, addSize, typeSizes);
 			safeAdd(extn, addSize, typeFullSizes);
 		}
@@ -47,6 +52,7 @@ public class Scanner {
 			//System.out.println("Loading " + childCompleteDetails.path + " into " + path);
 			
 			fullSize += childCompleteDetails.fullSize;
+			fullCount += childCompleteDetails.fullCount;
 			Set<String> childTypes = childCompleteDetails.typeFullSizes.keySet();
 			for (String childType : childTypes) {
 				long childTypeFullSize = childCompleteDetails.typeFullSizes.get(childType);
@@ -64,7 +70,7 @@ public class Scanner {
 
 		@Override
 		public String toString() {
-			return "FolderDetails [ path=" + path + ", size=" + size + ", fullSize=" + fullSize + ", \n typeSizes="
+			return "FolderDetails [ path=" + path + ", size=" + size + ", fullSize=" + fullSize + ", count=" + count + ", fullCount=" + fullCount + ", \n typeSizes="
 					+ typeSizes + ", \n typeFullSizes=" + typeFullSizes + "]";
 		}
 
@@ -96,13 +102,8 @@ public class Scanner {
 		}
 	}
 
-	public FolderDetails scan(Path rootFolder) throws IOException {
-		Map<Path, FolderDetails> allDetailsContainer = new HashMap<>();
-		FolderDetails rootFolderDetails = new FolderDetails(rootFolder);
-		allDetailsContainer.put(rootFolder, rootFolderDetails);
-
+	public void scan(Path rootFolder, Map<Path, FolderDetails> allDetailsContainer, DisplayWindow listener) throws IOException {
 		// Needs to be depth first. Else the cumulation wont work.
-		Files.walkFileTree(rootFolder, new SizingFileVisitor(rootFolder, this));
-		return rootFolderDetails;
+		Files.walkFileTree(rootFolder, new SizingFileVisitor(rootFolder, allDetailsContainer, listener));
 	}
 }
