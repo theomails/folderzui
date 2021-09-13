@@ -2,13 +2,17 @@ package net.progressit.pcomponent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.JComponent;
 
 import com.google.common.eventbus.EventBus;
 
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * Very incomplete. Just getting started.
@@ -28,14 +32,16 @@ public abstract class PComponent<T> {
 	}
 	
 	public static interface PEventListener{}
+	public static interface PPlacementHandler{
+		public void placeUiComponent(JComponent component);
+		public void removeUiComponent(JComponent component);		
+	}
 	public static interface PDataHandler <T>{
 		public Set<Object> grabSelfData(T data);
 		public Set<Object> grabChildrenData(T data);
 	}
 	public static interface PRenderHandler <T>{
 		public JComponent getUiComponent();
-		public void placeUiComponent(JComponent component);
-		public void removeUiComponent(JComponent component);
 		public void renderSelf(T data);
 		public PChildrenPlan renderChildrenPlan(T data);
 	}
@@ -75,40 +81,60 @@ public abstract class PComponent<T> {
 	}
 	
 	@Data
-	public static class PChildPlan<U>{
-		public final PComponent<U> component;
-		public final U data;
-		public final PEventListener listener;
+	@Builder
+	public static class PChildPlan{
+		public final PComponent<? extends Object> component;
+		public final Object data;
+		public final Optional<PEventListener> listener;
 	}
 	
 	@Data
 	public static class PChildrenPlan{
-		private final List<PChildPlan<Object>> childrenPlan = new ArrayList<>();
-		public void addChildPlan(PChildPlan<Object> childPlan) {
-			
+		private final List<PChildPlan> childrenPlan = new ArrayList<>();
+		public void addChildPlan(PChildPlan childPlan) {
+			childrenPlan.add(childPlan);
 		}
+	}
+	
+	public static <U> void place(PComponent<U> newComponent, PEventListener listener, U data){
+		JComponent uiComponent = newComponent.getRenderHandler().getUiComponent();
+		//uiComponent.setBorder(BorderFactory.createLineBorder(Color.red));
+		newComponent.getLifecycleHandler().prePlacement();
+		newComponent.getPlacementHandler().placeUiComponent(uiComponent);
+		newComponent.setListener(listener);
+		newComponent.getLifecycleHandler().postPlacement();
+		newComponent.setData(data);		
 	}
 	
 	private final EventBus bus = new EventBus();
 	//private final PComponent<?> parent;
+	@Getter(value = AccessLevel.PROTECTED)
+	private final PPlacementHandler placementHandler;
 	private PEventListener listener = null;
 	private T renderedData = null;
 	private Set<Object> renderedSelfData = null;
 	private Set<Object> renderedChildrenData = null;
-	private PChildrenPlan renderedPlan = null;
-	private final List<PComponent<?>> renderedComponents = new ArrayList<>();
+	private PChildrenPlan renderedPlan = new PChildrenPlan();
+	@SuppressWarnings("rawtypes")
+	private final List<PComponent> renderedComponents = new ArrayList<>();
 	
-	public PComponent() {
+	public PComponent(PPlacementHandler placementHandler) {
 		//this.parent = parent;
+		this.placementHandler = placementHandler;
 		if(getDataHandler()==null) throw new PComponentException("DataHandler is mandatory");
 		if(getRenderHandler()==null) throw new PComponentException("RenderHandler is mandatory");
 	}
 	
+	protected T getData() {
+		return renderedData;
+	}
 	/**
 	 * Feel free to set data always. This component will check and re-render only if necessary.
 	 * @param inData
 	 */
 	public void setData(T inData) {
+		System.out.println("SET DATA: " + getClass().getSimpleName() + ": " + inData);
+		
 		getLifecycleHandler().preData();
 		if(inData.equals(renderedData)) {
 			getLifecycleHandler().postData();
@@ -127,6 +153,7 @@ public abstract class PComponent<T> {
 			diffAndRenderPlan(childrenPlan);
 			renderedPlan = childrenPlan; //Plan has been rendered
 		}
+		renderedData = inData;
 		getLifecycleHandler().postData();
 	}
 	
@@ -138,15 +165,21 @@ public abstract class PComponent<T> {
 	}
 	public void setListener(PEventListener listener) {
 		this.listener = listener;
-		bus.register(listener);
+		if(listener!=null) {
+			bus.register(listener);
+		}
 	}
 	
 	protected abstract PDataHandler<T> getDataHandler();
 	protected abstract PRenderHandler<T> getRenderHandler();
 	protected abstract PLifecycleHandler getLifecycleHandler();
 
+	protected void post(Object event) {
+		System.out.println("POST: " + getClass().getSimpleName() + ": " + event);
+		bus.post(event);
+	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void diffAndRenderPlan(PChildrenPlan childrenPlan) {
 		int oldSize = renderedPlan.getChildrenPlan().size();
 		int newSize = childrenPlan.getChildrenPlan().size();
@@ -162,10 +195,10 @@ public abstract class PComponent<T> {
 		if(matchedCount>0) {
 			for(int i=0;i<matchedCount;i++) {
 				//Swap out info, so that same component is re-used, possibly for different data/listener
-				PChildPlan<Object> newPlan = childrenPlan.getChildrenPlan().get(i);
-				PComponent<Object> renderedComponent = (PComponent<Object>) renderedComponents.get(i);
+				PChildPlan newPlan = childrenPlan.getChildrenPlan().get(i);
+				PComponent<Object> renderedComponent = renderedComponents.get(i);
 				renderedComponent.clearListener();
-				renderedComponent.setListener( newPlan.getListener() );
+				renderedComponent.setListener( newPlan.getListener().orElse(null) );
 				renderedComponent.setData(newPlan.getData());
 			}
 		} 
@@ -173,10 +206,10 @@ public abstract class PComponent<T> {
 			if(oldSize > matchedCount) {
 				//Remove old comps
 				for(int i=matchedCount;i<oldSize;i++) {
-					PComponent<Object> oldComponent = (PComponent<Object>) renderedComponents.get(oldSize); //Get next available
+					PComponent oldComponent = renderedComponents.get(oldSize); //Get next available
 					JComponent uiComponent = oldComponent.getRenderHandler().getUiComponent();
 					oldComponent.getLifecycleHandler().preRemove();
-					oldComponent.getRenderHandler().removeUiComponent(uiComponent);
+					oldComponent.getPlacementHandler().removeUiComponent(uiComponent);
 					oldComponent.clearListener();
 					oldComponent.getLifecycleHandler().postRemove();
 					renderedComponents.remove(oldSize); //Remove the picked one
@@ -185,14 +218,15 @@ public abstract class PComponent<T> {
 			if(newSize>matchedCount) {
 				//Add new comps
 				for(int i=matchedCount;i<newSize;i++) {
-					PChildPlan<Object> newPlan = childrenPlan.getChildrenPlan().get(i);
-					PComponent<Object> newComponent = newPlan.getComponent(); //Get next available
+					PChildPlan newPlan = childrenPlan.getChildrenPlan().get(i);
+					PComponent newComponent = newPlan.getComponent(); //Get next available
 					JComponent uiComponent = newComponent.getRenderHandler().getUiComponent();
 					newComponent.getLifecycleHandler().prePlacement();
-					newComponent.getRenderHandler().placeUiComponent(uiComponent);
-					newComponent.setListener(newPlan.getListener());
+					newComponent.getPlacementHandler().placeUiComponent(uiComponent);
+					newComponent.setListener(newPlan.getListener().orElse(null));
 					newComponent.getLifecycleHandler().postPlacement();
 					newComponent.setData(newPlan.getData());
+					renderedComponents.add(newComponent);
 				}
 			}
 		}
