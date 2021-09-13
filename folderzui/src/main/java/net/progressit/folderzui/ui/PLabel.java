@@ -3,7 +3,6 @@ package net.progressit.folderzui.ui;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.JLabel;
 
 import lombok.Data;
@@ -23,34 +22,14 @@ public class PLabel extends PComponent<String>{
 
 	@Override
 	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>() {
-			@Override
-			public Set<Object> grabSelfData(String data) {
-				return Set.of(data);
-			}
-			@Override
-			public Set<Object> grabChildrenData(String data) {
-				return Set.of();
-			}
-		};
+		return new PDataHandler<String>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
 	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>() {
-			@Override
-			public JComponent getUiComponent() {
-				return label;
-			}
-			@Override
-			public void renderSelf(String data) {
-				label.setText(data);
-			}
-			@Override
-			public PChildrenPlan renderChildrenPlan(String data) {
-				return new PChildrenPlan();
-			}
-		};
+		return new PRenderHandler<String>( ()-> label, (data)->{
+			label.setText(data);
+		}, (data)-> new PChildrenPlan());
 	}
 
 	@Override

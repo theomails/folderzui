@@ -4,7 +4,6 @@ import java.awt.event.ActionEvent;
 import java.util.Set;
 
 import javax.swing.JButton;
-import javax.swing.JComponent;
 
 import lombok.Data;
 import net.progressit.pcomponent.PComponent;
@@ -23,34 +22,14 @@ public class PSimpleButton extends PComponent<String>{
 
 	@Override
 	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>() {
-			@Override
-			public Set<Object> grabSelfData(String data) {
-				return Set.of(data);
-			}
-			@Override
-			public Set<Object> grabChildrenData(String data) {
-				return Set.of();
-			}
-		};
+		return new PDataHandler<String>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
 	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>() {
-			@Override
-			public JComponent getUiComponent() {
-				return button;
-			}
-			@Override
-			public void renderSelf(String data) {
-				button.setText(data);
-			}
-			@Override
-			public PChildrenPlan renderChildrenPlan(String data) {
-				return new PChildrenPlan();
-			}
-		};
+		return new PRenderHandler<String>( ()-> button, (data)->{
+			button.setText(data);
+		}, (data)-> new PChildrenPlan());
 	}
 
 	@Override

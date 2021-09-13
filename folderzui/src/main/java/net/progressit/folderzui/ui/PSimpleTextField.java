@@ -3,8 +3,8 @@ package net.progressit.folderzui.ui;
 import java.awt.event.ActionEvent;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -29,36 +29,17 @@ public class PSimpleTextField extends PComponent<String>{
 
 	@Override
 	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>() {
-			@Override
-			public Set<Object> grabSelfData(String data) {
-				return Set.of(data);
-			}
-			@Override
-			public Set<Object> grabChildrenData(String data) {
-				return Set.of();
-			}
-		};
+		return new PDataHandler<String>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
 	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>() {
-			@Override
-			public JComponent getUiComponent() {
-				return textField;
+		return new PRenderHandler<String>( ()-> textField, (data)->{
+			if(!textField.getText().equals(data)) {
+				textField.setText(data);
 			}
-			@Override
-			public void renderSelf(String data) {
-				if(!textField.getText().equals(data)) {
-					textField.setText(data);
-				}
-			}
-			@Override
-			public PChildrenPlan renderChildrenPlan(String data) {
-				return new PChildrenPlan();
-			}
-		};
+		}, (data)-> new PChildrenPlan());
+
 	}
 
 	@Override
@@ -73,13 +54,21 @@ public class PSimpleTextField extends PComponent<String>{
 				//Below gets fired even when we programmatically do setText on the UI field.
 				textField.getDocument().addDocumentListener(new DocumentListener() {
 					public void changedUpdate(DocumentEvent e) {
-						post(new PSTFValueEvent(textField.getText()));
+						postChange();
 					}
 					public void removeUpdate(DocumentEvent e) {
-						post(new PSTFValueEvent(textField.getText()));
+						postChange();
 					}
 					public void insertUpdate(DocumentEvent e) {
-						post(new PSTFValueEvent(textField.getText()));
+						postChange();
+					}
+					
+					private void postChange() {
+						//Needed because getText doesn't stabilise until all the remove/insert events have fired.
+						SwingUtilities.invokeLater(()->{
+							String text = textField.getText();
+							post(new PSTFValueEvent(text));
+						});
 					}
 				});
 			}

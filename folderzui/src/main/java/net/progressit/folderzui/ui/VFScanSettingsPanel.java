@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
@@ -31,24 +30,16 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 	public static class VFSSPScanClickedEvent{
 	}
 	
-	private class SimplePlacementHandler implements PPlacementHandler {
-		@Override
-		public void removeUiComponent(JComponent component) {
-			panel.remove(component);
-		}
-		@Override
-		public void placeUiComponent(JComponent component) {
-			System.out.println("Adding " + component + " to " + panel);
-			panel.add(component);
-		}
-	}
 	
 	private PDisplayWindow window;
 	private JPanel panel = new JPanel(new MigLayout("insets 1","[]5[grow, fill]10[]5[]","[]"));
-	private PLabel lblPath = new PLabel( new SimplePlacementHandler() );
-	private PSimpleTextField txtPath = new PSimpleTextField( new SimplePlacementHandler() );
-	private PSimpleButton btnBrowse = new PSimpleButton( new SimplePlacementHandler() );
-	private PSimpleButton btnScan = new PSimpleButton( new SimplePlacementHandler() );
+	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->panel.add(component), (component)->panel.remove(component) );
+
+	private PLabel lblPath = new PLabel( simplePlacementHandler );
+	private PSimpleTextField txtPath = new PSimpleTextField( simplePlacementHandler );
+	private PSimpleButton btnBrowse = new PSimpleButton( simplePlacementHandler );
+	private PSimpleButton btnScan = new PSimpleButton( simplePlacementHandler );
+
 	
 	public VFScanSettingsPanel(PPlacementHandler placementHandler, PDisplayWindow window) {
 		super(placementHandler);
@@ -57,63 +48,43 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 
 	@Override
 	protected PDataHandler<VFScanSettings> getDataHandler() {
-		return new PDataHandler<VFScanSettings>() {
-			@Override
-			public Set<Object> grabSelfData(VFScanSettings data) {
-				return Set.of();
-			}
-			@Override
-			public Set<Object> grabChildrenData(VFScanSettings data) {
-				return Set.of(data.getPath()); //Nothing to react to
-			}
-		};
+		return new PDataHandler<VFScanSettings>( (data)->Set.of(), (data)->Set.of(data.getPath()) );
 	}
 
 	@Override
 	protected PRenderHandler<VFScanSettings> getRenderHandler() {
-		return new PRenderHandler<VFScanSettings>() {
-			@Override
-			public JComponent getUiComponent() {
-				return panel;
-			}
-			@Override
-			public void renderSelf(VFScanSettings data) {
-				
-			}
-			@Override
-			public PChildrenPlan renderChildrenPlan(VFScanSettings data) {
-				PChildrenPlan plans = new PChildrenPlan();
-				
-				PChildPlan plan = PChildPlan.builder().component(lblPath).data("Folder to Scan: ").listener(Optional.empty()).build();
-				plans.addChildPlan(plan);
-				
-				plan = PChildPlan.builder().component(txtPath).data(data.path).listener( Optional.of( new PEventListener() {
-					@Subscribe
-					public void handle(PSTFValueEvent e) {
-						post(new VFSSPPathChangedEvent(e.getValue()));
-					}
-				} )).build();
-				plans.addChildPlan(plan);
-				
-				plan = PChildPlan.builder().component(btnBrowse).data("Browse...").listener(Optional.of( new PEventListener() {
-					@Subscribe
-					public void handle(PSBActionEvent e) {
-						onBrowseClick();
-					}
-				} )).build();
-				plans.addChildPlan(plan);
-				
-				plan = PChildPlan.builder().component(btnScan).data("Scan").listener(Optional.of( new PEventListener() {
-					@Subscribe
-					public void handle(PSBActionEvent e) {
-						onScanClick();
-					}
-				} )).build();
-				plans.addChildPlan(plan);
-				
-				return plans;
-			}
-		};
+		return new PRenderHandler<VFScanSettings>( ()-> panel, (data)->{}, (data)->{
+			PChildrenPlan plans = new PChildrenPlan();
+			
+			PChildPlan plan = PChildPlan.builder().component(lblPath).data("Folder to Scan: ").listener(Optional.empty()).build();
+			plans.addChildPlan(plan);
+			
+			plan = PChildPlan.builder().component(txtPath).data(data.path).listener( Optional.of( new PEventListener() {
+				@Subscribe
+				public void handle(PSTFValueEvent e) {
+					post(new VFSSPPathChangedEvent(e.getValue()));
+				}
+			} )).build();
+			plans.addChildPlan(plan);
+			
+			plan = PChildPlan.builder().component(btnBrowse).data("Browse...").listener(Optional.of( new PEventListener() {
+				@Subscribe
+				public void handle(PSBActionEvent e) {
+					onBrowseClick();
+				}
+			} )).build();
+			plans.addChildPlan(plan);
+			
+			plan = PChildPlan.builder().component(btnScan).data("Scan").listener(Optional.of( new PEventListener() {
+				@Subscribe
+				public void handle(PSBActionEvent e) {
+					onScanClick();
+				}
+			} )).build();
+			plans.addChildPlan(plan);
+			
+			return plans;
+		} );
 	}
 	
 	public void onBrowseClick() {
@@ -130,6 +101,7 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 				result = chooser.getCurrentDirectory();
 			}
 			String sPath = result.toPath().toString();
+			System.out.println("SEND: " + sPath);
 			post(new VFSSPPathChangedEvent(sPath));
 		}
 	}

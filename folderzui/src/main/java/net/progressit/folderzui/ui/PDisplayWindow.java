@@ -3,7 +3,6 @@ package net.progressit.folderzui.ui;
 import java.awt.BorderLayout;
 
 import javax.swing.BorderFactory;
-import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -24,28 +23,17 @@ public class PDisplayWindow extends JFrame{
 		window.setVisible(true);
 	}
 	
-	
-	private VFScanSettingsPanel pnlSettings = new VFScanSettingsPanel(new PPlacementHandler() {
-		@Override
-		public void removeUiComponent(JComponent component) {
-			System.out.println("Removing " + component + " from " + pnlMain);
-			pnlMain.remove(component);
-		}
-		
-		@Override
-		public void placeUiComponent(JComponent component) {
-			System.out.println("Adding " + component + " to " + pnlMain);
-			pnlMain.add(component, BorderLayout.NORTH);
-		}
-	}, this);
-	
 	private VFScanSettingsPanel.VFScanSettings data = new VFScanSettingsPanel.VFScanSettings(System.getProperty("user.home"));
 	private JPanel pnlMain = new JPanel(new BorderLayout());
+	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->pnlMain.add(component), (component)->pnlMain.remove(component) );
+	private VFScanSettingsPanel pnlSettings = new VFScanSettingsPanel(simplePlacementHandler, this);
+
 	private void init() {
 		getContentPane().add(pnlMain, BorderLayout.CENTER);
 		PComponent.place(pnlSettings, new PEventListener() {
 			@Subscribe
 			public void on(VFSSPPathChangedEvent e) {
+				System.out.println("HANDLE: " + e.getPath());
 				data = new VFScanSettingsPanel.VFScanSettings( e.getPath() );
 				pnlSettings.setData(data);
 			}

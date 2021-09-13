@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import javax.swing.JComponent;
 
@@ -32,18 +35,21 @@ public abstract class PComponent<T> {
 	}
 	
 	public static interface PEventListener{}
-	public static interface PPlacementHandler{
-		public void placeUiComponent(JComponent component);
-		public void removeUiComponent(JComponent component);		
+	@Data
+	public static class PPlacementHandler{
+		private final Consumer<JComponent> placer;
+		private final Consumer<JComponent> remover;		
 	}
-	public static interface PDataHandler <T>{
-		public Set<Object> grabSelfData(T data);
-		public Set<Object> grabChildrenData(T data);
+	@Data
+	public static class PDataHandler <T>{
+		private final Function<T, Set<Object>> selfDataGetter;
+		private final Function<T, Set<Object>> childrenDataGetter;
 	}
-	public static interface PRenderHandler <T>{
-		public JComponent getUiComponent();
-		public void renderSelf(T data);
-		public PChildrenPlan renderChildrenPlan(T data);
+	@Data
+	public static class PRenderHandler <T>{
+		private final Supplier<JComponent> uiComponentMaker;
+		private final Consumer<T> selfRenderer;
+		private final Function<T, PChildrenPlan> childrenPlanRenderer;
 	}
 	public static interface PLifecycleHandler {
 		public void prePlacement();
@@ -97,10 +103,10 @@ public abstract class PComponent<T> {
 	}
 	
 	public static <U> void place(PComponent<U> newComponent, PEventListener listener, U data){
-		JComponent uiComponent = newComponent.getRenderHandler().getUiComponent();
+		JComponent uiComponent = newComponent.getRenderHandler().uiComponentMaker.get();
 		//uiComponent.setBorder(BorderFactory.createLineBorder(Color.red));
 		newComponent.getLifecycleHandler().prePlacement();
-		newComponent.getPlacementHandler().placeUiComponent(uiComponent);
+		newComponent.getPlacementHandler().placer.accept(uiComponent);
 		newComponent.setListener(listener);
 		newComponent.getLifecycleHandler().postPlacement();
 		newComponent.setData(data);		
@@ -141,14 +147,14 @@ public abstract class PComponent<T> {
 			return;
 		}
 		//Some change is there
-		Set<Object> selfData = getDataHandler().grabSelfData(inData);
-		Set<Object> childrenData = getDataHandler().grabChildrenData(inData);
+		Set<Object> selfData = getDataHandler().selfDataGetter.apply(inData);
+		Set<Object> childrenData = getDataHandler().childrenDataGetter.apply(inData);
 		if(!selfData.equals(renderedSelfData)) {
-			getRenderHandler().renderSelf(inData);
+			getRenderHandler().selfRenderer.accept(inData);
 			renderedSelfData = selfData;
 		}
 		if(!childrenData.equals(renderedChildrenData)) {
-			PChildrenPlan childrenPlan = getRenderHandler().renderChildrenPlan(inData);
+			PChildrenPlan childrenPlan = getRenderHandler().childrenPlanRenderer.apply(inData);
 			renderedChildrenData = childrenData; //Data has been processed into plan
 			diffAndRenderPlan(childrenPlan);
 			renderedPlan = childrenPlan; //Plan has been rendered
@@ -207,9 +213,9 @@ public abstract class PComponent<T> {
 				//Remove old comps
 				for(int i=matchedCount;i<oldSize;i++) {
 					PComponent oldComponent = renderedComponents.get(oldSize); //Get next available
-					JComponent uiComponent = oldComponent.getRenderHandler().getUiComponent();
+					JComponent uiComponent = (JComponent) oldComponent.getRenderHandler().uiComponentMaker.get();
 					oldComponent.getLifecycleHandler().preRemove();
-					oldComponent.getPlacementHandler().removeUiComponent(uiComponent);
+					oldComponent.getPlacementHandler().remover.accept(uiComponent);
 					oldComponent.clearListener();
 					oldComponent.getLifecycleHandler().postRemove();
 					renderedComponents.remove(oldSize); //Remove the picked one
@@ -220,9 +226,9 @@ public abstract class PComponent<T> {
 				for(int i=matchedCount;i<newSize;i++) {
 					PChildPlan newPlan = childrenPlan.getChildrenPlan().get(i);
 					PComponent newComponent = newPlan.getComponent(); //Get next available
-					JComponent uiComponent = newComponent.getRenderHandler().getUiComponent();
+					JComponent uiComponent = (JComponent) newComponent.getRenderHandler().uiComponentMaker.get();
 					newComponent.getLifecycleHandler().prePlacement();
-					newComponent.getPlacementHandler().placeUiComponent(uiComponent);
+					newComponent.getPlacementHandler().placer.accept(uiComponent);
 					newComponent.setListener(newPlan.getListener().orElse(null));
 					newComponent.getLifecycleHandler().postPlacement();
 					newComponent.setData(newPlan.getData());
