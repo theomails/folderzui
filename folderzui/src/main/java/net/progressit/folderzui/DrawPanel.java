@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 
-class DrawPanel extends JPanel {
+public class DrawPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	public static class DPRenderException extends Exception{

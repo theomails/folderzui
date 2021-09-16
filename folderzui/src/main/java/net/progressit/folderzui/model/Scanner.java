@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import lombok.Data;
-import net.progressit.folderzui.DisplayWindow;
 
 public class Scanner {
 
@@ -102,7 +101,7 @@ public class Scanner {
 		}
 	}
 
-	public void scan(Path rootFolder, Map<Path, FolderDetails> allDetailsContainer, DisplayWindow listener) throws IOException {
+	public void scan(Path rootFolder, Map<Path, FolderDetails> allDetailsContainer, Object listener) throws IOException {
 		// Needs to be depth first. Else the cumulation wont work.
 		Files.walkFileTree(rootFolder, new SizingFileVisitor(rootFolder, allDetailsContainer, listener));
 	}

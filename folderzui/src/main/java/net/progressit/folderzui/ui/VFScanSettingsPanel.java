@@ -13,15 +13,10 @@ import lombok.Data;
 import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.ui.PSimpleButton.PSBActionEvent;
 import net.progressit.folderzui.ui.PSimpleTextField.PSTFValueEvent;
-import net.progressit.folderzui.ui.VFScanSettingsPanel.VFScanSettings;
 import net.progressit.pcomponent.PComponent;
 
-public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
-	@Data
-	public static class VFScanSettings{
-		private final String path;
-	}
-	
+public class VFScanSettingsPanel extends PComponent<String, String>{
+	//EVENTS
 	@Data
 	public static class VFSSPPathChangedEvent{
 		private final String path;
@@ -40,26 +35,25 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 	private PSimpleButton btnBrowse = new PSimpleButton( simplePlacementHandler );
 	private PSimpleButton btnScan = new PSimpleButton( simplePlacementHandler );
 
-	
 	public VFScanSettingsPanel(PPlacementHandler placementHandler, PDisplayWindow window) {
 		super(placementHandler);
 		this.window = window;
 	}
 
 	@Override
-	protected PDataHandler<VFScanSettings> getDataHandler() {
-		return new PDataHandler<VFScanSettings>( (data)->Set.of(), (data)->Set.of(data.getPath()) );
+	protected PDataHandler<String> getDataHandler() {
+		return new PDataHandler<String>( (data)->Set.of(), (data)->Set.of(data) );
 	}
 
 	@Override
-	protected PRenderHandler<VFScanSettings> getRenderHandler() {
-		return new PRenderHandler<VFScanSettings>( ()-> panel, (data)->{}, (data)->{
+	protected PRenderHandler<String> getRenderHandler() {
+		return new PRenderHandler<String>( ()-> panel, (data)->{}, (data)->{
 			PChildrenPlan plans = new PChildrenPlan();
 			
-			PChildPlan plan = PChildPlan.builder().component(lblPath).data("Folder to Scan: ").listener(Optional.empty()).build();
+			PChildPlan plan = PChildPlan.builder().component(lblPath).props("Folder to Scan: ").listener(Optional.empty()).build();
 			plans.addChildPlan(plan);
 			
-			plan = PChildPlan.builder().component(txtPath).data(data.path).listener( Optional.of( new PEventListener() {
+			plan = PChildPlan.builder().component(txtPath).props(data).listener( Optional.of( new PEventListener() {
 				@Subscribe
 				public void handle(PSTFValueEvent e) {
 					post(new VFSSPPathChangedEvent(e.getValue()));
@@ -67,7 +61,7 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 			} )).build();
 			plans.addChildPlan(plan);
 			
-			plan = PChildPlan.builder().component(btnBrowse).data("Browse...").listener(Optional.of( new PEventListener() {
+			plan = PChildPlan.builder().component(btnBrowse).props("Browse...").listener(Optional.of( new PEventListener() {
 				@Subscribe
 				public void handle(PSBActionEvent e) {
 					onBrowseClick();
@@ -75,7 +69,7 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 			} )).build();
 			plans.addChildPlan(plan);
 			
-			plan = PChildPlan.builder().component(btnScan).data("Scan").listener(Optional.of( new PEventListener() {
+			plan = PChildPlan.builder().component(btnScan).props("Scan").listener(Optional.of( new PEventListener() {
 				@Subscribe
 				public void handle(PSBActionEvent e) {
 					onScanClick();
@@ -89,8 +83,8 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 	
 	public void onBrowseClick() {
 		JFileChooser chooser = new JFileChooser();
-		System.out.println("Trying to open folder.." + getData().getPath());
-		chooser.setCurrentDirectory(new File( getData().getPath() ));
+		System.out.println("Trying to open folder.." + getData());
+		chooser.setCurrentDirectory(new File( getData() ));
 		chooser.setDialogTitle("Choose Folder to Scan...");
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		// disable the "All files" option.
@@ -111,7 +105,12 @@ public class VFScanSettingsPanel extends PComponent<VFScanSettings>{
 
 	@Override
 	protected PLifecycleHandler getLifecycleHandler() {
-		return new PSimpleLifecycleHandler();
+		return new PSimpleLifecycleHandler() {
+			@Override
+			public void postProps() {
+				setData( getProps() );
+			}
+		};
 	}
 
 }

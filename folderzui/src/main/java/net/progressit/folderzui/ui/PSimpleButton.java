@@ -8,14 +8,13 @@ import javax.swing.JButton;
 import lombok.Data;
 import net.progressit.pcomponent.PComponent;
 
-public class PSimpleButton extends PComponent<String>{
+public class PSimpleButton extends PComponent<String, String>{
 	@Data
 	public static class PSBActionEvent{
 		private final ActionEvent event;
 	}
 	
 	private JButton button = new JButton();
-	
 	public PSimpleButton(PPlacementHandler placementHandler) {
 		super(placementHandler);
 	}
@@ -40,6 +39,10 @@ public class PSimpleButton extends PComponent<String>{
 				button.addActionListener((e)->{
 					post(new PSBActionEvent(e));
 				});
+			}
+			@Override
+			public void postProps() {
+				setData(getProps());
 			}
 		};
 	}

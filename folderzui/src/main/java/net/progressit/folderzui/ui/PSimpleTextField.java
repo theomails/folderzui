@@ -11,7 +11,7 @@ import javax.swing.event.DocumentListener;
 import lombok.Data;
 import net.progressit.pcomponent.PComponent;
 
-public class PSimpleTextField extends PComponent<String>{
+public class PSimpleTextField extends PComponent<String, String>{
 	@Data
 	public static class PSTFActionEvent{
 		private final ActionEvent event;
@@ -22,7 +22,6 @@ public class PSimpleTextField extends PComponent<String>{
 	}
 	
 	private JTextField textField = new JTextField();
-	
 	public PSimpleTextField(PPlacementHandler placementHandler) {
 		super(placementHandler);
 	}
@@ -71,6 +70,10 @@ public class PSimpleTextField extends PComponent<String>{
 						});
 					}
 				});
+			}
+			@Override
+			public void postProps() {
+				setData(getProps());
 			}
 		};
 	}

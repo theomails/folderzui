@@ -2,14 +2,8 @@ package net.progressit.folderzui.ui;
 
 import java.awt.BorderLayout;
 
-import javax.swing.BorderFactory;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 
-import com.google.common.eventbus.Subscribe;
-
-import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPPathChangedEvent;
-import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPScanClickedEvent;
 import net.progressit.pcomponent.PComponent;
 import net.progressit.pcomponent.PComponent.PEventListener;
 import net.progressit.pcomponent.PComponent.PPlacementHandler;
@@ -23,27 +17,12 @@ public class PDisplayWindow extends JFrame{
 		window.setVisible(true);
 	}
 	
-	private VFScanSettingsPanel.VFScanSettings data = new VFScanSettingsPanel.VFScanSettings(System.getProperty("user.home"));
-	private JPanel pnlMain = new JPanel(new BorderLayout());
-	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->pnlMain.add(component), (component)->pnlMain.remove(component) );
-	private VFScanSettingsPanel pnlSettings = new VFScanSettingsPanel(simplePlacementHandler, this);
+	private String home = System.getProperty("user.home");
+	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->getContentPane().add(component, BorderLayout.CENTER), (component)->getContentPane().remove(component) );
+	private VisualizeFolderApp app = new VisualizeFolderApp(simplePlacementHandler, this);
 
 	private void init() {
-		getContentPane().add(pnlMain, BorderLayout.CENTER);
-		PComponent.place(pnlSettings, new PEventListener() {
-			@Subscribe
-			public void on(VFSSPPathChangedEvent e) {
-				System.out.println("HANDLE: " + e.getPath());
-				data = new VFScanSettingsPanel.VFScanSettings( e.getPath() );
-				pnlSettings.setData(data);
-			}
-			@Subscribe
-			public void on(VFSSPScanClickedEvent e) {
-				System.out.println("Scan clicked... " + data.getPath());
-			}
-		}, data);
-		
-		pnlMain.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+		PComponent.place(app, new PEventListener() {}, home);
 		
 		setSize(800, 600);
 		setLocationRelativeTo(null);

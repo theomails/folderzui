@@ -8,14 +8,13 @@ import javax.swing.JLabel;
 import lombok.Data;
 import net.progressit.pcomponent.PComponent;
 
-public class PLabel extends PComponent<String>{
+public class PLabel extends PComponent<String, String>{
 	@Data
 	public static class PLActionEvent{
 		private final ActionEvent event;
 	}
 	
 	private JLabel label = new JLabel();
-	
 	public PLabel(PPlacementHandler placementHandler) {
 		super(placementHandler);
 	}
@@ -34,7 +33,12 @@ public class PLabel extends PComponent<String>{
 
 	@Override
 	protected PLifecycleHandler getLifecycleHandler() {
-		return new PSimpleLifecycleHandler();
+		return new PSimpleLifecycleHandler() {
+			@Override
+			public void postProps() {
+				setData(getProps());
+			}
+		};
 	}
 
 }
