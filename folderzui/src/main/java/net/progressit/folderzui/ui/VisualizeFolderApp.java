@@ -1,6 +1,7 @@
 package net.progressit.folderzui.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -93,7 +94,18 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 			plan = PChildPlan.builder().component(treePanel).props( Paths.get(data.scanPath) ).listener( Optional.of( new PEventListener() {
 				@Subscribe
 				public void handle(VFRTPFolderClickEvent e) {
-					//TODO Click and Double click
+					FolderDetails details = e.getFolder();
+					if(e.getClickCount()==1) {
+						setData( getData().toBuilder().usageData(details).build() );					
+					}else if(e.getClickCount()==2) {
+						try {
+							Desktop.getDesktop().open(details.getPath().toFile());
+						} catch (IOException ex) {
+							setData(getData().toBuilder().statusData(new VFStatusData("Unable to open the folder: " + details.getPath())).build());
+							System.err.println(ex);
+							ex.printStackTrace();
+						}
+					}
 				}
 			} )).build();
 			plans.addChildPlan(plan);
@@ -111,10 +123,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	}
 	
 	private void startScan() {
-		//pathNodesMap.clear();
-		//treeFolders.removeAll();
-		//DefaultTreeModel treeModel = (DefaultTreeModel) treeFolders.getModel();
-		//treeModel.setRoot(nodeDummyRoot);
+
 
 		try {
 			setData(getData().toBuilder().statusData(new VFStatusData("Scanning...")).build());

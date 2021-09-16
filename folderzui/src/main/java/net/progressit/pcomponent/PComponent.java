@@ -196,7 +196,7 @@ public abstract class PComponent<T,U> {
 	protected void setData(T inData) {
 		LOGGER.info(string("setData", inData));
 		
-		if(inData.equals(renderedData)) {
+		if((inData==null && renderedData==null) || inData.equals(renderedData)) {
 			return;
 		}
 		//Some change is there

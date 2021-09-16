@@ -8,14 +8,9 @@ import lombok.Data;
 import net.progressit.folderzui.DrawPanel;
 import net.progressit.folderzui.DrawPanel.DPRenderException;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
-import net.progressit.folderzui.ui.VFUsageDisplayPanel.VFUsageDisplayData;
 import net.progressit.pcomponent.PComponent;
 
-public class VFUsageDisplayPanel extends PComponent<VFUsageDisplayData, VFUsageDisplayData>{
-	@Data
-	public static class VFUsageDisplayData{
-		private final FolderDetails folderDetails;
-	}
+public class VFUsageDisplayPanel extends PComponent<FolderDetails, FolderDetails>{
 	@Data
 	public static class VFUDErrorEvent{
 		private final Throwable error;
@@ -30,15 +25,15 @@ public class VFUsageDisplayPanel extends PComponent<VFUsageDisplayData, VFUsageD
 	}
 
 	@Override
-	protected PDataHandler<VFUsageDisplayData> getDataHandler() {
-		return new PDataHandler<VFUsageDisplayData>( (data)->Set.of(data.getFolderDetails()), (data)->Set.of() );
+	protected PDataHandler<FolderDetails> getDataHandler() {
+		return new PDataHandler<FolderDetails>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderHandler<VFUsageDisplayData> getRenderHandler() {
-		return new PRenderHandler<VFUsageDisplayData>( ()-> spDrawPanel, (data)->{
+	protected PRenderHandler<FolderDetails> getRenderHandler() {
+		return new PRenderHandler<FolderDetails>( ()-> spDrawPanel, (data)->{
 			try {
-				drawPanel.setDetails(data.getFolderDetails()); //Null is fine
+				drawPanel.setDetails(data); //Null is fine
 			} catch (DPRenderException e) {
 				post( new VFUDErrorEvent(e) );
 			}
@@ -47,7 +42,12 @@ public class VFUsageDisplayPanel extends PComponent<VFUsageDisplayData, VFUsageD
 
 	@Override
 	protected PLifecycleHandler getLifecycleHandler() {
-		return new PSimpleLifecycleHandler();
+		return new PSimpleLifecycleHandler() {
+			@Override
+			public void postProps() {
+				setData( getProps() );
+			}
+		};
 	}
 
 }

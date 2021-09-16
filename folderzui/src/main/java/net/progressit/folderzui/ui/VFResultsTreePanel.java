@@ -105,7 +105,8 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 			Path rootFolder = getData();
 			if(dir.equals( rootFolder )) {
 				pathNodesMap.clear();
-				DefaultTreeModel treeModel = (DefaultTreeModel) treeFolders.getModel();			
+				treeFolders.removeAll();
+				DefaultTreeModel treeModel = (DefaultTreeModel) treeFolders.getModel();
 				//Make and save
 				FolderDetailsNodeData nodeData = FolderDetailsNodeData.builder().path(dir).folderDetails(folderDetails).build();
 				MutableTreeNode node = new DefaultMutableTreeNode( nodeData, true );
@@ -172,11 +173,7 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 							if(nodeDummyRoot!=selectedNode) {
 								FolderDetailsNodeData nodeData = (FolderDetailsNodeData) selectedNode.getUserObject();
 								post(new VFRTPFolderClickEvent(nodeData.getFolderDetails(), 1));
-//								try {
-//									drawPanel.setDetails(nodeData.getFolderDetails());
-//								} catch (DPRenderException ex) {
-//									eventBus.post( DVProblemEvent.error(ex.getMessage(), ex.getCause()) );
-//								}
+
 							}
 						}
 					}
@@ -192,11 +189,7 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 								if(nodeDummyRoot!=selectedNode) {
 									FolderDetailsNodeData nodeData = (FolderDetailsNodeData) selectedNode.getUserObject();
 									post(new VFRTPFolderClickEvent(nodeData.getFolderDetails(), 2));
-//									try {
-//										Desktop.getDesktop().open(nodeData.path.toFile());
-//									} catch (IOException ex) {
-//										eventBus.post( DVProblemEvent.error("Unable to open the folder ", ex) );
-//									}
+
 								}
 							}
 				        }
