@@ -15,18 +15,18 @@ public class PSimpleButton extends PComponent<String, String>{
 	}
 	
 	private JButton button = new JButton();
-	public PSimpleButton(PPlacementHandler placementHandler) {
-		super(placementHandler);
+	public PSimpleButton(PPlacers placers) {
+		super(placers);
 	}
 
 	@Override
-	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>( (data)->Set.of(data), (data)->Set.of() );
+	protected PDataPeekers<String> getDataPeekers() {
+		return new PDataPeekers<String>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>( ()-> button, (data)->{
+	protected PRenderers<String> getRenderers() {
+		return new PRenderers<String>( ()-> button, (data)->{
 			button.setText(data);
 		}, (data)-> new PChildrenPlan());
 	}

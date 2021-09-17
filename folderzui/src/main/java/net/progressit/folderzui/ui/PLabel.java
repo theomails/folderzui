@@ -15,18 +15,18 @@ public class PLabel extends PComponent<String, String>{
 	}
 	
 	private JLabel label = new JLabel();
-	public PLabel(PPlacementHandler placementHandler) {
-		super(placementHandler);
+	public PLabel(PPlacers placers) {
+		super(placers);
 	}
 
 	@Override
-	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>( (data)->Set.of(data), (data)->Set.of() );
+	protected PDataPeekers<String> getDataPeekers() {
+		return new PDataPeekers<String>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>( ()-> label, (data)->{
+	protected PRenderers<String> getRenderers() {
+		return new PRenderers<String>( ()-> label, (data)->{
 			label.setText(data);
 		}, (data)-> new PChildrenPlan());
 	}

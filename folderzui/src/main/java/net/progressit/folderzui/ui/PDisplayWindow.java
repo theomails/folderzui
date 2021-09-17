@@ -6,7 +6,7 @@ import javax.swing.JFrame;
 
 import net.progressit.pcomponent.PComponent;
 import net.progressit.pcomponent.PComponent.PEventListener;
-import net.progressit.pcomponent.PComponent.PPlacementHandler;
+import net.progressit.pcomponent.PComponent.PPlacers;
 
 public class PDisplayWindow extends JFrame{
 	private static final long serialVersionUID = 1L;
@@ -18,8 +18,8 @@ public class PDisplayWindow extends JFrame{
 	}
 	
 	private String home = System.getProperty("user.home");
-	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->getContentPane().add(component, BorderLayout.CENTER), (component)->getContentPane().remove(component) );
-	private VisualizeFolderApp app = new VisualizeFolderApp(simplePlacementHandler, this);
+	private PPlacers simplePlacers = new PPlacers( (component)->getContentPane().add(component, BorderLayout.CENTER), (component)->getContentPane().remove(component) );
+	private VisualizeFolderApp app = new VisualizeFolderApp(simplePlacers, this);
 
 	private void init() {
 		PComponent.place(app, new PEventListener() {}, home);

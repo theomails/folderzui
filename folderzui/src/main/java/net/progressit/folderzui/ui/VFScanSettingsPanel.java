@@ -28,26 +28,26 @@ public class VFScanSettingsPanel extends PComponent<String, String>{
 	
 	private PDisplayWindow window;
 	private JPanel panel = new JPanel(new MigLayout("insets 1","[]5[grow, fill]10[]5[]","[]"));
-	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->panel.add(component), (component)->panel.remove(component) );
+	private PPlacers simplePlacers = new PPlacers( (component)->panel.add(component), (component)->panel.remove(component) );
 
-	private PLabel lblPath = new PLabel( simplePlacementHandler );
-	private PSimpleTextField txtPath = new PSimpleTextField( simplePlacementHandler );
-	private PSimpleButton btnBrowse = new PSimpleButton( simplePlacementHandler );
-	private PSimpleButton btnScan = new PSimpleButton( simplePlacementHandler );
+	private PLabel lblPath = new PLabel( simplePlacers );
+	private PSimpleTextField txtPath = new PSimpleTextField( simplePlacers );
+	private PSimpleButton btnBrowse = new PSimpleButton( simplePlacers );
+	private PSimpleButton btnScan = new PSimpleButton( simplePlacers );
 
-	public VFScanSettingsPanel(PPlacementHandler placementHandler, PDisplayWindow window) {
-		super(placementHandler);
+	public VFScanSettingsPanel(PPlacers placers, PDisplayWindow window) {
+		super(placers);
 		this.window = window;
 	}
 
 	@Override
-	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>( (data)->Set.of(), (data)->Set.of(data) );
+	protected PDataPeekers<String> getDataPeekers() {
+		return new PDataPeekers<String>( (data)->Set.of(), (data)->Set.of(data) );
 	}
 
 	@Override
-	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>( ()-> panel, (data)->{}, (data)->{
+	protected PRenderers<String> getRenderers() {
+		return new PRenderers<String>( ()-> panel, (data)->{}, (data)->{
 			PChildrenPlan plans = new PChildrenPlan();
 			
 			PChildPlan plan = PChildPlan.builder().component(lblPath).props("Folder to Scan: ").listener(Optional.empty()).build();

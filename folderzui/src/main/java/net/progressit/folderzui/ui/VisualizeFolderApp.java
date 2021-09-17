@@ -46,9 +46,9 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	private JPanel pnlResults = new JPanel(new MigLayout("insets 0","[300::, grow, fill]5[400::,grow, fill]","10[grow, fill]10"));
 	
 	//Progressive support
-	private PPlacementHandler mainNorthPlacementHandler = new PPlacementHandler( (component)->pnlMain.add(component, BorderLayout.NORTH), (component)->pnlMain.remove(component) );
-	private PPlacementHandler mainSouthPlacementHandler = new PPlacementHandler( (component)->pnlMain.add(component, BorderLayout.SOUTH), (component)->pnlMain.remove(component) );
-	private PPlacementHandler resultsPlacementHandler = new PPlacementHandler( (component)->pnlResults.add(component), (component)->pnlResults.remove(component) );
+	private PPlacers mainNorthPlacementHandler = new PPlacers( (component)->pnlMain.add(component, BorderLayout.NORTH), (component)->pnlMain.remove(component) );
+	private PPlacers mainSouthPlacementHandler = new PPlacers( (component)->pnlMain.add(component, BorderLayout.SOUTH), (component)->pnlMain.remove(component) );
+	private PPlacers resultsPlacementHandler = new PPlacers( (component)->pnlResults.add(component), (component)->pnlResults.remove(component) );
 	//Progressive
 	private VFScanSettingsPanel settingsPanel = new VFScanSettingsPanel(mainNorthPlacementHandler, window);
 	private VFResultsTreePanel treePanel = new VFResultsTreePanel(resultsPlacementHandler);
@@ -63,19 +63,19 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 			.build();
 	
 	
-	public VisualizeFolderApp(PPlacementHandler placementHandler, PDisplayWindow window) {
-		super(placementHandler);
+	public VisualizeFolderApp(PPlacers placers, PDisplayWindow window) {
+		super(placers);
 		this.window = window;
 	}
 
 	@Override
-	protected PDataHandler<VisualizeFolderAppData> getDataHandler() {
-		return new PDataHandler<VisualizeFolderAppData>( (data)->Set.of(), (data)->Set.of(data) );
+	protected PDataPeekers<VisualizeFolderAppData> getDataPeekers() {
+		return new PDataPeekers<VisualizeFolderAppData>( (data)->Set.of(), (data)->Set.of(data) );
 	}
 
 	@Override
-	protected PRenderHandler<VisualizeFolderAppData> getRenderHandler() {
-		return new PRenderHandler<VisualizeFolderAppData>( ()-> pnlMain, (data)->{}, (data)->{
+	protected PRenderers<VisualizeFolderAppData> getRenderers() {
+		return new PRenderers<VisualizeFolderAppData>( ()-> pnlMain, (data)->{}, (data)->{
 			PChildrenPlan plans = new PChildrenPlan();
 			
 			PChildPlan plan = PChildPlan.builder().component(settingsPanel).props(data.scanPath).listener( Optional.of( new PEventListener() {

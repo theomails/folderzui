@@ -22,18 +22,18 @@ public class PSimpleTextField extends PComponent<String, String>{
 	}
 	
 	private JTextField textField = new JTextField();
-	public PSimpleTextField(PPlacementHandler placementHandler) {
-		super(placementHandler);
+	public PSimpleTextField(PPlacers placers) {
+		super(placers);
 	}
 
 	@Override
-	protected PDataHandler<String> getDataHandler() {
-		return new PDataHandler<String>( (data)->Set.of(data), (data)->Set.of() );
+	protected PDataPeekers<String> getDataPeekers() {
+		return new PDataPeekers<String>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderHandler<String> getRenderHandler() {
-		return new PRenderHandler<String>( ()-> textField, (data)->{
+	protected PRenderers<String> getRenderers() {
+		return new PRenderers<String>( ()-> textField, (data)->{
 			if(!textField.getText().equals(data)) {
 				textField.setText(data);
 			}

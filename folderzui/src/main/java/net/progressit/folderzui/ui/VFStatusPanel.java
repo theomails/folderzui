@@ -19,21 +19,21 @@ public class VFStatusPanel extends PComponent<VFStatusData, VFStatusData>{
 	}
 	
 	private JPanel panel = new JPanel(new MigLayout("insets 1","[grow, fill]","[]"));
-	private PPlacementHandler simplePlacementHandler = new PPlacementHandler( (component)->panel.add(component), (component)->panel.remove(component) );
+	private PPlacers simplePlacers = new PPlacers( (component)->panel.add(component), (component)->panel.remove(component) );
 
-	private PLabel lblStatus = new PLabel( simplePlacementHandler );
-	public VFStatusPanel(PPlacementHandler placementHandler) {
-		super(placementHandler);
+	private PLabel lblStatus = new PLabel( simplePlacers );
+	public VFStatusPanel(PPlacers placers) {
+		super(placers);
 	}
 
 	@Override
-	protected PDataHandler<VFStatusData> getDataHandler() {
-		return new PDataHandler<VFStatusData>( (data)->Set.of(), (data)->Set.of(data.getInfo()) );
+	protected PDataPeekers<VFStatusData> getDataPeekers() {
+		return new PDataPeekers<VFStatusData>( (data)->Set.of(), (data)->Set.of(data.getInfo()) );
 	}
 
 	@Override
-	protected PRenderHandler<VFStatusData> getRenderHandler() {
-		return new PRenderHandler<VFStatusData>( ()-> panel, (data)->{}, (data)->{
+	protected PRenderers<VFStatusData> getRenderers() {
+		return new PRenderers<VFStatusData>( ()-> panel, (data)->{}, (data)->{
 			PChildrenPlan plans = new PChildrenPlan();
 			
 			PChildPlan plan = PChildPlan.builder().component(lblStatus).props(data.getInfo()).listener(Optional.empty()).build();

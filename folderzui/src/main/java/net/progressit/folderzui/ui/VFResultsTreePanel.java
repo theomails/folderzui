@@ -82,18 +82,18 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 	private JTree treeFolders = new JTree();
 	private JScrollPane spTreeFolders = new JScrollPane(treeFolders);
 
-	public VFResultsTreePanel(PPlacementHandler placementHandler) {
-		super(placementHandler);
+	public VFResultsTreePanel(PPlacers placers) {
+		super(placers);
 	}
 
 	@Override
-	protected PDataHandler<Path> getDataHandler() {
-		return new PDataHandler<Path>( (data)->Set.of( data ), (data)->Set.of() );
+	protected PDataPeekers<Path> getDataPeekers() {
+		return new PDataPeekers<Path>( (data)->Set.of( data ), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderHandler<Path> getRenderHandler() {
-		return new PRenderHandler<Path>( ()-> spTreeFolders, (data)->{  }, (data)-> new PChildrenPlan() );
+	protected PRenderers<Path> getRenderers() {
+		return new PRenderers<Path>( ()-> spTreeFolders, (data)->{  }, (data)-> new PChildrenPlan() );
 	}
 	
 

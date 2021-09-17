@@ -20,18 +20,18 @@ public class VFUsageDisplayPanel extends PComponent<FolderDetails, FolderDetails
 	private JScrollPane spDrawPanel = new JScrollPane(drawPanel);
 
 	
-	public VFUsageDisplayPanel(PPlacementHandler placementHandler) {
-		super(placementHandler);
+	public VFUsageDisplayPanel(PPlacers placers) {
+		super(placers);
 	}
 
 	@Override
-	protected PDataHandler<FolderDetails> getDataHandler() {
-		return new PDataHandler<FolderDetails>( (data)->Set.of(data), (data)->Set.of() );
+	protected PDataPeekers<FolderDetails> getDataPeekers() {
+		return new PDataPeekers<FolderDetails>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderHandler<FolderDetails> getRenderHandler() {
-		return new PRenderHandler<FolderDetails>( ()-> spDrawPanel, (data)->{
+	protected PRenderers<FolderDetails> getRenderers() {
+		return new PRenderers<FolderDetails>( ()-> spDrawPanel, (data)->{
 			try {
 				drawPanel.setDetails(data); //Null is fine
 			} catch (DPRenderException e) {

@@ -35,13 +35,13 @@ import lombok.Getter;
  * <li>Child should never edit the props passed in. However, child can manage its own data. Child should keep the framework informed about changes in its data. In fact, it is 
  * recommended that the child not store any data in local variables, and rather just pass the data directly to <code>setData</code> method. Note that the props have to be merged
  * into the data, and passed on to the framework. This it because the framework just hands over the props and does not monitor or react to the props.
- * <li>Parent has to provide placement logic through a <code>PPlacementHandler</code> for each child, and the lambda function will be used by framework when the child's Swing component needs to be placed.
- * <li>PComponent subclass itself has to provide a <code>PDataHandler</code> which will define which part of the data field affects its own Swing components
+ * <li>Parent has to provide placement logic through a <code>PPlacers</code> for each child, and the lambda function will be used by framework when the child's Swing component needs to be placed.
+ * <li>PComponent subclass itself has to provide a <code>PDataPeekers</code> which will define which part of the data field affects its own Swing components
  * vs which part of the data affects its PComponent children.
- * <li>PComponent also needs to provide lambdas via <code>PRenderHandler</code> to render the data into (1) its own Swing components and (2) to generate a render plan of PComponent children
+ * <li>PComponent also needs to provide lambdas via <code>PDataPeekers</code> to render the data into (1) its own Swing components and (2) to generate a render plan of PComponent children
  * <li>PComponent also needs to provide a <code>PSimpleLifecycleHandler</code> to hook into its own lifecycle.
  * <li>Having setup all the above, at the time of using the PComponent, a <code>PEventListener</code> has to be provided along with the props.
- * <li>Most of the PComponent tree of the application will be used inside <code>childrenPlanRenderer</code> lambda of the parent PComponent's <code>PRenderHandler</code>
+ * <li>Most of the PComponent tree of the application will be used inside <code>childrenPlanRenderer</code> lambda of the parent PComponent's <code>PDataPeekers</code>
  * <li>However, the top-most one (or few) PComponents can be placed manually by calling the <code>PComponent.place</code> static method. 
  * <li>Once all the lambdas and handlers are setup for a PComponent, the rendering only starts on the first <code>setData</code> call. However, <code>setData</code> is never called
  * by framework. Framework only calls <code>setProps</code> to trigger the component. The component has to merge it with/pass it on as <code>setData</code>.
@@ -78,17 +78,17 @@ public abstract class PComponent<T,U> {
 	
 	public static interface PEventListener{}
 	@Data
-	public static class PPlacementHandler{
+	public static class PPlacers{
 		private final Consumer<JComponent> placer;
 		private final Consumer<JComponent> remover;		
 	}
 	@Data
-	public static class PDataHandler <T>{
+	public static class PDataPeekers <T>{
 		private final Function<T, Set<Object>> selfDataGetter;
 		private final Function<T, Set<Object>> childrenDataGetter;
 	}
 	@Data
-	public static class PRenderHandler <T>{
+	public static class PRenderers <T>{
 		private final Supplier<JComponent> uiComponentMaker;
 		private final Consumer<T> selfRenderer;
 		private final Function<T, PChildrenPlan> childrenPlanRenderer;
@@ -149,10 +149,10 @@ public abstract class PComponent<T,U> {
 	
 	public static <V> void place(PComponent<?,V> newComponent, PEventListener listener, V props){
 		LOGGER.info(string("Place"));
-		JComponent uiComponent = newComponent.getRenderHandler().uiComponentMaker.get();
+		JComponent uiComponent = newComponent.getRenderers().uiComponentMaker.get();
 		//uiComponent.setBorder(BorderFactory.createLineBorder(Color.red));
 		newComponent.getLifecycleHandler().prePlacement();
-		newComponent.getPlacementHandler().placer.accept(uiComponent);
+		newComponent.getPlacers().placer.accept(uiComponent);
 		newComponent.setListener(listener);
 		newComponent.setProps(props);
 		newComponent.getLifecycleHandler().postPlacement();
@@ -161,7 +161,7 @@ public abstract class PComponent<T,U> {
 	private final EventBus bus = new EventBus();
 	//private final PComponent<?> parent;
 	@Getter(value = AccessLevel.PROTECTED)
-	private final PPlacementHandler placementHandler;
+	private final PPlacers placers;
 	private PEventListener listener = null;
 	private T renderedData = null;
 	private U renderedProps = null;
@@ -171,11 +171,11 @@ public abstract class PComponent<T,U> {
 	@SuppressWarnings("rawtypes")
 	private final List<PComponent> renderedComponents = new ArrayList<>();
 	
-	public PComponent(PPlacementHandler placementHandler) {
+	public PComponent(PPlacers placers) {
 		//this.parent = parent;
-		this.placementHandler = placementHandler;
-		if(getDataHandler()==null) throw new PComponentException("DataHandler is mandatory");
-		if(getRenderHandler()==null) throw new PComponentException("RenderHandler is mandatory");
+		this.placers = placers;
+		if(getDataPeekers()==null) throw new PComponentException("DataHandler is mandatory");
+		if(getRenderers()==null) throw new PComponentException("RenderHandler is mandatory");
 	}
 	protected void setProps(U props) {
 		LOGGER.info(string("setProps", props));
@@ -200,15 +200,15 @@ public abstract class PComponent<T,U> {
 			return;
 		}
 		//Some change is there
-		Set<Object> selfData = getDataHandler().selfDataGetter.apply(inData);
-		Set<Object> childrenData = getDataHandler().childrenDataGetter.apply(inData);
+		Set<Object> selfData = getDataPeekers().selfDataGetter.apply(inData);
+		Set<Object> childrenData = getDataPeekers().childrenDataGetter.apply(inData);
 		if(!selfData.equals(renderedSelfData)) {
-			getRenderHandler().selfRenderer.accept(inData);
+			getRenderers().selfRenderer.accept(inData);
 			renderedSelfData = selfData;
 		}
 		renderedData = inData; //Set before going to children.
 		if(!childrenData.equals(renderedChildrenData)) {
-			PChildrenPlan childrenPlan = getRenderHandler().childrenPlanRenderer.apply(inData);
+			PChildrenPlan childrenPlan = getRenderers().childrenPlanRenderer.apply(inData);
 			renderedChildrenData = childrenData; //Data has been processed into plan
 			diffAndRenderPlan(childrenPlan);
 			renderedPlan = childrenPlan; //Plan has been rendered
@@ -236,8 +236,8 @@ public abstract class PComponent<T,U> {
 		}
 	}
 	
-	protected abstract PDataHandler<T> getDataHandler();
-	protected abstract PRenderHandler<T> getRenderHandler();
+	protected abstract PDataPeekers<T> getDataPeekers();
+	protected abstract PRenderers<T> getRenderers();
 	protected abstract PLifecycleHandler getLifecycleHandler();
 
 	protected void post(Object event) {
@@ -276,9 +276,9 @@ public abstract class PComponent<T,U> {
 				//Remove old comps
 				for(int i=matchedCount;i<oldSize;i++) {
 					PComponent oldComponent = renderedComponents.get(oldSize); //Get next available
-					JComponent uiComponent = (JComponent) oldComponent.getRenderHandler().uiComponentMaker.get();
+					JComponent uiComponent = (JComponent) oldComponent.getRenderers().uiComponentMaker.get();
 					oldComponent.getLifecycleHandler().preRemove();
-					oldComponent.getPlacementHandler().remover.accept(uiComponent);
+					oldComponent.getPlacers().remover.accept(uiComponent);
 					oldComponent.clearListener();  
 					oldComponent.getLifecycleHandler().postRemove();
 					renderedComponents.remove(oldSize); //Remove the picked one
@@ -289,10 +289,10 @@ public abstract class PComponent<T,U> {
 				for(int i=matchedCount;i<newSize;i++) {
 					PChildPlan newPlan = childrenPlan.getChildrenPlan().get(i);
 					PComponent newComponent = newPlan.getComponent(); //Get next available
-					JComponent uiComponent = (JComponent) newComponent.getRenderHandler().uiComponentMaker.get();
+					JComponent uiComponent = (JComponent) newComponent.getRenderers().uiComponentMaker.get();
 					renderedComponents.add(newComponent);
 					newComponent.getLifecycleHandler().prePlacement();
-					newComponent.getPlacementHandler().placer.accept(uiComponent);
+					newComponent.getPlacers().placer.accept(uiComponent);
 					newComponent.setListener(newPlan.getListener().orElse(null));
 					newComponent.getLifecycleHandler().postPlacement();
 					newComponent.getLifecycleHandler().preProps();
