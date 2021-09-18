@@ -10,13 +10,6 @@ import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.ui.VFStatusPanel.VFStatusData;
 import net.progressit.progressive.PAllToChildrenDataPeekers;
 import net.progressit.progressive.PComponent;
-import net.progressit.progressive.PComponent.PChildPlan;
-import net.progressit.progressive.PComponent.PChildrenPlan;
-import net.progressit.progressive.PComponent.PDataPeekers;
-import net.progressit.progressive.PComponent.PLifecycleHandler;
-import net.progressit.progressive.PComponent.PPlacers;
-import net.progressit.progressive.PComponent.PRenderers;
-import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
 import net.progressit.progressive.PLabel;
 import net.progressit.progressive.PSimpleContainerPlacers;
 
