@@ -4,9 +4,9 @@ import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 
-import net.progressit.pcomponent.PComponent;
-import net.progressit.pcomponent.PComponent.PEventListener;
-import net.progressit.pcomponent.PComponent.PPlacers;
+import net.progressit.progressive.PComponent;
+import net.progressit.progressive.PComponent.PEventListener;
+import net.progressit.progressive.PComponent.PPlacers;
 
 public class PDisplayWindow extends JFrame{
 	private static final long serialVersionUID = 1L;

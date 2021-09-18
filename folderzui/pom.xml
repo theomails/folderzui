@@ -7,7 +7,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Folderz UI</name>
 	<description>Folder visualization</description>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<maven.compiler.target>1.8</maven.compiler.target>
@@ -59,6 +59,11 @@
 		</dependency>
 
 		<!-- UI Frameworks -->
+		<dependency>
+			<groupId>net.progressit</groupId>
+			<artifactId>progressive</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 		<!-- https://mvnrepository.com/artifact/com.miglayout/miglayout-swing -->
 		<dependency>
 			<groupId>com.miglayout</groupId>

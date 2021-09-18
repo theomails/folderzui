@@ -8,9 +8,17 @@ import lombok.Builder;
 import lombok.Data;
 import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.ui.VFStatusPanel.VFStatusData;
-import net.progressit.pcomponent.PAllToChildrenDataPeekers;
-import net.progressit.pcomponent.PComponent;
-import net.progressit.pcomponent.PSimpleContainerPlacers;
+import net.progressit.progressive.PAllToChildrenDataPeekers;
+import net.progressit.progressive.PComponent;
+import net.progressit.progressive.PComponent.PChildPlan;
+import net.progressit.progressive.PComponent.PChildrenPlan;
+import net.progressit.progressive.PComponent.PDataPeekers;
+import net.progressit.progressive.PComponent.PLifecycleHandler;
+import net.progressit.progressive.PComponent.PPlacers;
+import net.progressit.progressive.PComponent.PRenderers;
+import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
+import net.progressit.progressive.PLabel;
+import net.progressit.progressive.PSimpleContainerPlacers;
 
 public class VFStatusPanel extends PComponent<VFStatusData, VFStatusData>{
 	@Data

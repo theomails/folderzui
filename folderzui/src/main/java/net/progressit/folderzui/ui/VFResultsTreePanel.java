@@ -26,7 +26,13 @@ import net.progressit.folderzui.model.Scanner.FolderDetails;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFileVisitEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFolderEndEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFolderStartEvent;
-import net.progressit.pcomponent.PComponent;
+import net.progressit.progressive.PComponent;
+import net.progressit.progressive.PComponent.PChildrenPlan;
+import net.progressit.progressive.PComponent.PDataPeekers;
+import net.progressit.progressive.PComponent.PLifecycleHandler;
+import net.progressit.progressive.PComponent.PPlacers;
+import net.progressit.progressive.PComponent.PRenderers;
+import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
 
 public class VFResultsTreePanel extends PComponent<Path, Path>{
 

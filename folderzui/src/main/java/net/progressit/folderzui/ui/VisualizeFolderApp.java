@@ -27,8 +27,16 @@ import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPPathChangedEvent;
 import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPScanClickedEvent;
 import net.progressit.folderzui.ui.VFStatusPanel.VFStatusData;
 import net.progressit.folderzui.ui.VisualizeFolderApp.VisualizeFolderAppData;
-import net.progressit.pcomponent.PComponent;
-import net.progressit.pcomponent.PSimpleContainerPlacers;
+import net.progressit.progressive.PComponent;
+import net.progressit.progressive.PComponent.PChildPlan;
+import net.progressit.progressive.PComponent.PChildrenPlan;
+import net.progressit.progressive.PComponent.PDataPeekers;
+import net.progressit.progressive.PComponent.PEventListener;
+import net.progressit.progressive.PComponent.PLifecycleHandler;
+import net.progressit.progressive.PComponent.PPlacers;
+import net.progressit.progressive.PComponent.PRenderers;
+import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
+import net.progressit.progressive.PSimpleContainerPlacers;
 
 public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, String>{
 	

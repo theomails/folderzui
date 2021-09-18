@@ -8,7 +8,14 @@ import lombok.Data;
 import net.progressit.folderzui.DrawPanel;
 import net.progressit.folderzui.DrawPanel.DPRenderException;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
-import net.progressit.pcomponent.PComponent;
+import net.progressit.folderzui.ui.VFUsageDisplayPanel.VFUDErrorEvent;
+import net.progressit.progressive.PComponent;
+import net.progressit.progressive.PComponent.PChildrenPlan;
+import net.progressit.progressive.PComponent.PDataPeekers;
+import net.progressit.progressive.PComponent.PLifecycleHandler;
+import net.progressit.progressive.PComponent.PPlacers;
+import net.progressit.progressive.PComponent.PRenderers;
+import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
 
 public class VFUsageDisplayPanel extends PComponent<FolderDetails, FolderDetails>{
 	@Data
