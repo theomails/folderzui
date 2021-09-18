@@ -1,11 +1,11 @@
 package net.progressit.folderzui.ui;
 
 import java.awt.event.ActionEvent;
-import java.util.Set;
 
 import javax.swing.JButton;
 
 import lombok.Data;
+import net.progressit.pcomponent.PAllToSelfDataPeekers;
 import net.progressit.pcomponent.PComponent;
 
 public class PSimpleButton extends PComponent<String, String>{
@@ -21,7 +21,7 @@ public class PSimpleButton extends PComponent<String, String>{
 
 	@Override
 	protected PDataPeekers<String> getDataPeekers() {
-		return new PDataPeekers<String>( (data)->Set.of(data), (data)->Set.of() );
+		return new PAllToSelfDataPeekers<String>();
 	}
 
 	@Override

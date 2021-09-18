@@ -28,6 +28,7 @@ import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPScanClickedEvent;
 import net.progressit.folderzui.ui.VFStatusPanel.VFStatusData;
 import net.progressit.folderzui.ui.VisualizeFolderApp.VisualizeFolderAppData;
 import net.progressit.pcomponent.PComponent;
+import net.progressit.pcomponent.PSimpleContainerPlacers;
 
 public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, String>{
 	
@@ -48,7 +49,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	//Progressive support
 	private PPlacers mainNorthPlacementHandler = new PPlacers( (component)->pnlMain.add(component, BorderLayout.NORTH), (component)->pnlMain.remove(component) );
 	private PPlacers mainSouthPlacementHandler = new PPlacers( (component)->pnlMain.add(component, BorderLayout.SOUTH), (component)->pnlMain.remove(component) );
-	private PPlacers resultsPlacementHandler = new PPlacers( (component)->pnlResults.add(component), (component)->pnlResults.remove(component) );
+	private PPlacers resultsPlacementHandler = new PSimpleContainerPlacers(pnlResults);
 	//Progressive
 	private VFScanSettingsPanel settingsPanel = new VFScanSettingsPanel(mainNorthPlacementHandler, window);
 	private VFResultsTreePanel treePanel = new VFResultsTreePanel(resultsPlacementHandler);

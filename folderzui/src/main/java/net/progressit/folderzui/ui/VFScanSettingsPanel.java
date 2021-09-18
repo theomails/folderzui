@@ -2,7 +2,6 @@ package net.progressit.folderzui.ui;
 
 import java.io.File;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -13,7 +12,9 @@ import lombok.Data;
 import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.ui.PSimpleButton.PSBActionEvent;
 import net.progressit.folderzui.ui.PSimpleTextField.PSTFValueEvent;
+import net.progressit.pcomponent.PAllToChildrenDataPeekers;
 import net.progressit.pcomponent.PComponent;
+import net.progressit.pcomponent.PSimpleContainerPlacers;
 
 public class VFScanSettingsPanel extends PComponent<String, String>{
 	//EVENTS
@@ -28,7 +29,7 @@ public class VFScanSettingsPanel extends PComponent<String, String>{
 	
 	private PDisplayWindow window;
 	private JPanel panel = new JPanel(new MigLayout("insets 1","[]5[grow, fill]10[]5[]","[]"));
-	private PPlacers simplePlacers = new PPlacers( (component)->panel.add(component), (component)->panel.remove(component) );
+	private PPlacers simplePlacers = new PSimpleContainerPlacers(panel);
 
 	private PLabel lblPath = new PLabel( simplePlacers );
 	private PSimpleTextField txtPath = new PSimpleTextField( simplePlacers );
@@ -42,7 +43,7 @@ public class VFScanSettingsPanel extends PComponent<String, String>{
 
 	@Override
 	protected PDataPeekers<String> getDataPeekers() {
-		return new PDataPeekers<String>( (data)->Set.of(), (data)->Set.of(data) );
+		return new PAllToChildrenDataPeekers<String>();
 	}
 
 	@Override

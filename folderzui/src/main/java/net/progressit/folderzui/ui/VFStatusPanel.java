@@ -1,7 +1,6 @@
 package net.progressit.folderzui.ui;
 
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.JPanel;
 
@@ -9,7 +8,9 @@ import lombok.Builder;
 import lombok.Data;
 import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.ui.VFStatusPanel.VFStatusData;
+import net.progressit.pcomponent.PAllToChildrenDataPeekers;
 import net.progressit.pcomponent.PComponent;
+import net.progressit.pcomponent.PSimpleContainerPlacers;
 
 public class VFStatusPanel extends PComponent<VFStatusData, VFStatusData>{
 	@Data
@@ -19,7 +20,7 @@ public class VFStatusPanel extends PComponent<VFStatusData, VFStatusData>{
 	}
 	
 	private JPanel panel = new JPanel(new MigLayout("insets 1","[grow, fill]","[]"));
-	private PPlacers simplePlacers = new PPlacers( (component)->panel.add(component), (component)->panel.remove(component) );
+	private PPlacers simplePlacers = new PSimpleContainerPlacers(panel);
 
 	private PLabel lblStatus = new PLabel( simplePlacers );
 	public VFStatusPanel(PPlacers placers) {
@@ -28,7 +29,7 @@ public class VFStatusPanel extends PComponent<VFStatusData, VFStatusData>{
 
 	@Override
 	protected PDataPeekers<VFStatusData> getDataPeekers() {
-		return new PDataPeekers<VFStatusData>( (data)->Set.of(), (data)->Set.of(data.getInfo()) );
+		return new PAllToChildrenDataPeekers<VFStatusData>();
 	}
 
 	@Override

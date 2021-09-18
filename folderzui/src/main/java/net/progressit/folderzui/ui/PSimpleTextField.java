@@ -1,7 +1,6 @@
 package net.progressit.folderzui.ui;
 
 import java.awt.event.ActionEvent;
-import java.util.Set;
 
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -9,6 +8,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import lombok.Data;
+import net.progressit.pcomponent.PAllToSelfDataPeekers;
 import net.progressit.pcomponent.PComponent;
 
 public class PSimpleTextField extends PComponent<String, String>{
@@ -28,7 +28,7 @@ public class PSimpleTextField extends PComponent<String, String>{
 
 	@Override
 	protected PDataPeekers<String> getDataPeekers() {
-		return new PDataPeekers<String>( (data)->Set.of(data), (data)->Set.of() );
+		return new PAllToSelfDataPeekers<String>();
 	}
 
 	@Override
