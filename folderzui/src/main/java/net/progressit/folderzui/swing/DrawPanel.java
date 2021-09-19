@@ -1,4 +1,4 @@
-package net.progressit.folderzui;
+package net.progressit.folderzui.swing;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -15,6 +15,8 @@ import net.progressit.folderzui.model.Scanner.FolderDetails;
 public class DrawPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
+	public enum DrawPanelMode { SIZE, COUNT }
+	
 	public static class DPRenderException extends Exception{
 		private static final long serialVersionUID = 1L;
 		public DPRenderException(String message, Exception sourceException) {
@@ -22,9 +24,11 @@ public class DrawPanel extends JPanel {
 		}
 	}
 
+	private DrawPanelMode mode;
 	private FolderDetails details=null;
-	public void setDetails(FolderDetails details) throws DPRenderException {
+	public void setDetails(FolderDetails details, DrawPanelMode mode) throws DPRenderException {
 		try {
+			this.mode = mode;
 			this.details = details;
 			this.repaint();
 		}catch(RuntimeException e) {
@@ -40,7 +44,7 @@ public class DrawPanel extends JPanel {
 		
 		if(details==null) return;
 
-		double total = details.getFullSize();
+		double total = getFullValue(details);
 		double height = DrawPanel.this.getHeight();
 		scale = height / total;
 		drawBox(0d, 0d, 50d, childHeight(details, scale), height(details, scale), fileName(details), g2d); // Root folder fills :)
@@ -55,7 +59,7 @@ public class DrawPanel extends JPanel {
 		Set<Path> paths = children.keySet();
 		for (Path path : paths) {
 			FolderDetails child = children.get(path);
-			double height = dbl(child.getFullSize()) * scale;
+			double height = getFullValue(child) * scale;
 			drawBox(x, y, 50d, childHeight(child, scale), height(child, scale), fileName(child), g2d);
 			if (!child.getChildrenDetails().isEmpty()) {
 				drawChildren(scale, y, level + 1, child.getChildrenDetails(), g2d);
@@ -86,7 +90,8 @@ public class DrawPanel extends JPanel {
 	private String perc(FolderDetails details) {
 		//double perc = dbl(details.getSize()) / dbl(details.getFullSize()) * 100d;
 		//return String.format("%.2f of %dmb", perc, details.getFullSize()/1000_000);
-		return String.format("%dmb", details.getFullSize()/1000_000);
+		long value = (long) getFullValue(details);
+		return String.format("%dmb", value/1000_000);
 	}
 	private double dbl(long val) {
 		return (double) val;
@@ -101,12 +106,18 @@ public class DrawPanel extends JPanel {
 		return fileName==null?"Drive":fileName.toString();
 	}
 	private double height(FolderDetails details, double scale) {
-		return dbl(details.getFullSize()) * scale;
+		return  getFullValue(details) * scale;
 	}
 	private double childHeight(FolderDetails details, double scale) {
-		long childSize = details.getFullSize() - details.getSize();
-		return dbl(childSize) * scale;
+		double childSize = getFullValue(details) - getValue(details);
+		return childSize * scale;
 	}
 
+	private double getFullValue(FolderDetails details) {
+		return (mode==DrawPanelMode.SIZE)?details.getFullSize():details.getFullCount();
+	}
+	private double getValue(FolderDetails details) {
+		return (mode==DrawPanelMode.SIZE)?details.getSize():details.getCount();
+	}
 
 }

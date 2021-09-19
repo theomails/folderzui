@@ -40,13 +40,15 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
-import net.progressit.folderzui.DrawPanel.DPRenderException;
 import net.progressit.folderzui.model.Scanner;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFileVisitEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFolderEndEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFolderStartEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVProblemEvent;
+import net.progressit.folderzui.swing.DrawPanel;
+import net.progressit.folderzui.swing.DrawPanel.DPRenderException;
+import net.progressit.folderzui.swing.DrawPanel.DrawPanelMode;
 
 public class DisplayWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -210,7 +212,7 @@ public class DisplayWindow extends JFrame {
 					if(nodeDummyRoot!=selectedNode) {
 						FolderDetailsNodeData nodeData = (FolderDetailsNodeData) selectedNode.getUserObject();
 						try {
-							drawPanel.setDetails(nodeData.getFolderDetails());
+							drawPanel.setDetails(nodeData.getFolderDetails(), DrawPanelMode.SIZE);
 						} catch (DPRenderException ex) {
 							eventBus.post( DVProblemEvent.error(ex.getMessage(), ex.getCause()) );
 						}
@@ -317,7 +319,7 @@ public class DisplayWindow extends JFrame {
 				
 				doLater( ()->{
 					try {
-						drawPanel.setDetails(allDetailsContainer.get(rootFolder));
+						drawPanel.setDetails(allDetailsContainer.get(rootFolder), DrawPanelMode.SIZE);
 					} catch (DPRenderException ex) {
 						displayWindow.getEventBus().post( DVProblemEvent.error(ex.getMessage(), ex.getCause()) );
 					}

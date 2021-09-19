@@ -22,20 +22,14 @@ import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.model.Scanner;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
+import net.progressit.folderzui.swing.DrawPanel.DrawPanelMode;
 import net.progressit.folderzui.ui.VFResultsTreePanel.VFRTPFolderClickEvent;
 import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPPathChangedEvent;
 import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPScanClickedEvent;
 import net.progressit.folderzui.ui.VFStatusPanel.VFStatusData;
+import net.progressit.folderzui.ui.VFUsageDisplayOptionsPanel.VFUDOData;
 import net.progressit.folderzui.ui.VisualizeFolderApp.VisualizeFolderAppData;
 import net.progressit.progressive.PComponent;
-import net.progressit.progressive.PComponent.PChildPlan;
-import net.progressit.progressive.PComponent.PChildrenPlan;
-import net.progressit.progressive.PComponent.PDataPeekers;
-import net.progressit.progressive.PComponent.PEventListener;
-import net.progressit.progressive.PComponent.PLifecycleHandler;
-import net.progressit.progressive.PComponent.PPlacers;
-import net.progressit.progressive.PComponent.PRenderers;
-import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
 import net.progressit.progressive.PSimpleContainerPlacers;
 
 public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, String>{
@@ -44,7 +38,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	@Builder(toBuilder = true)
 	public static class VisualizeFolderAppData{
 		private final String scanPath;
-		private final FolderDetails usageData;
+		private final VFUDOData usageOptionsData;
 		private final VFStatusData statusData;		
 	}
 	
@@ -52,7 +46,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	private PDisplayWindow window;
 	//My swing
 	private JPanel pnlMain = new JPanel(new BorderLayout()); //export
-	private JPanel pnlResults = new JPanel(new MigLayout("insets 0","[300::, grow, fill]5[400::,grow, fill]","10[grow, fill]10"));
+	private JPanel pnlResults = new JPanel(new MigLayout("insets 0","[300::, grow 300, fill]5[400::,grow 600, fill]","10[grow, fill]10"));
 	
 	//Progressive support
 	private PPlacers mainNorthPlacementHandler = new PPlacers( (component)->pnlMain.add(component, BorderLayout.NORTH), (component)->pnlMain.remove(component) );
@@ -61,13 +55,13 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	//Progressive
 	private VFScanSettingsPanel settingsPanel = new VFScanSettingsPanel(mainNorthPlacementHandler, window);
 	private VFResultsTreePanel treePanel = new VFResultsTreePanel(resultsPlacementHandler);
-	private VFUsageDisplayPanel usagePanel = new VFUsageDisplayPanel(resultsPlacementHandler);
+	private VFUsageDisplayOptionsPanel usageOptionsPanel = new VFUsageDisplayOptionsPanel(resultsPlacementHandler);
 	private VFStatusPanel statusPanel = new VFStatusPanel(mainSouthPlacementHandler);
 	
 	//STATE
 	private VisualizeFolderAppData defaultData = VisualizeFolderAppData.builder()
 			.scanPath("")
-			.usageData(null)
+			.usageOptionsData( new VFUDOData(null, DrawPanelMode.SIZE) )
 			.statusData(new VFStatusData("Ready."))
 			.build();
 	
@@ -105,7 +99,8 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 				public void handle(VFRTPFolderClickEvent e) {
 					FolderDetails details = e.getFolder();
 					if(e.getClickCount()==1) {
-						setData( getData().toBuilder().usageData(details).build() );					
+						VFUDOData newChildData = getData().getUsageOptionsData().toBuilder().folderDetails(details).build();
+						setData( getData().toBuilder().usageOptionsData( newChildData ).build() );					
 					}else if(e.getClickCount()==2) {
 						try {
 							Desktop.getDesktop().open(details.getPath().toFile());
@@ -119,7 +114,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 			} )).build();
 			plans.addChildPlan(plan);
 			
-			plan = PChildPlan.builder().component(usagePanel).props(data.usageData).listener(Optional.of( new PEventListener() {
+			plan = PChildPlan.builder().component(usageOptionsPanel).props(data.usageOptionsData).listener(Optional.of( new PEventListener() {
 				//Need to listen to mouse motion
 			} )).build();
 			plans.addChildPlan(plan);
@@ -160,7 +155,9 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 				doLater( ()->{
 					try {
 						FolderDetails rootDetails = allDetailsContainer.get(rootFolder);
-						setData(getData().toBuilder().usageData(rootDetails).build());
+						VFUDOData newChildData = getData().getUsageOptionsData().toBuilder().folderDetails(rootDetails).build();
+						
+						setData(getData().toBuilder().usageOptionsData(newChildData).build());
 						setData(getData().toBuilder().statusData(new VFStatusData("Ready.")).build());
 					} catch (Exception ex) {
 						setData(getData().toBuilder().statusData(new VFStatusData("Error rendering usage data.")).build());
