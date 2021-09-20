@@ -21,7 +21,7 @@ public class PDisplayWindow extends JFrame{
 	private PPlacers simplePlacers = new PPlacers( (component)->getContentPane().add(component, BorderLayout.CENTER), (component)->getContentPane().remove(component) );
 	private VisualizeFolderApp app = new VisualizeFolderApp(simplePlacers, this);
 
-	private void init() {
+	public void init() {
 		PComponent.place(app, new PEventListener() {}, home);
 		
 		setSize(800, 600);

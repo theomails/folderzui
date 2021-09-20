@@ -1,6 +1,7 @@
 package net.progressit.folderzui.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Container;
 import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -23,6 +24,7 @@ import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.model.Scanner;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 import net.progressit.folderzui.swing.DrawPanel.DrawPanelMode;
+import net.progressit.folderzui.ui.VFResultsTreePanel.VFRTPErrorEvent;
 import net.progressit.folderzui.ui.VFResultsTreePanel.VFRTPFolderClickEvent;
 import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPPathChangedEvent;
 import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPScanClickedEvent;
@@ -43,7 +45,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	}
 	
 	//Swing Context 
-	private PDisplayWindow window;
+	private Container window;
 	//My swing
 	private JPanel pnlMain = new JPanel(new BorderLayout()); //export
 	private JPanel pnlResults = new JPanel(new MigLayout("insets 0","[300::, grow 300, fill]5[400::,grow 600, fill]","10[grow, fill]10"));
@@ -66,7 +68,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 			.build();
 	
 	
-	public VisualizeFolderApp(PPlacers placers, PDisplayWindow window) {
+	public VisualizeFolderApp(PPlacers placers, Container window) {
 		super(placers);
 		this.window = window;
 	}
@@ -110,6 +112,10 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 							ex.printStackTrace();
 						}
 					}
+				}
+				@Subscribe
+				public void handle(VFRTPErrorEvent e) {
+					setData(getData().toBuilder().statusData(new VFStatusData(e.getMessage())).build());
 				}
 			} )).build();
 			plans.addChildPlan(plan);

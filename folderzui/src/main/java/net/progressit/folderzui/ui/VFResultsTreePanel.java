@@ -21,18 +21,11 @@ import com.google.common.eventbus.Subscribe;
 
 import lombok.Builder;
 import lombok.Data;
-import net.progressit.folderzui.DisplayWindow.DVProblemEvent;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFileVisitEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFolderEndEvent;
 import net.progressit.folderzui.model.SizingFileVisitor.SFVFolderStartEvent;
 import net.progressit.progressive.PComponent;
-import net.progressit.progressive.PComponent.PChildrenPlan;
-import net.progressit.progressive.PComponent.PDataPeekers;
-import net.progressit.progressive.PComponent.PLifecycleHandler;
-import net.progressit.progressive.PComponent.PPlacers;
-import net.progressit.progressive.PComponent.PRenderers;
-import net.progressit.progressive.PComponent.PSimpleLifecycleHandler;
 
 public class VFResultsTreePanel extends PComponent<Path, Path>{
 
@@ -40,6 +33,12 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 	public static class VFRTPFolderClickEvent{
 		private final FolderDetails folder;
 		private final int clickCount;
+	}
+	
+	@Data
+	public static class VFRTPErrorEvent{
+		private final String message;
+		private final Throwable error;
 	}
 	
 	@Data
@@ -137,7 +136,9 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 				}
 			}
 		}catch(RuntimeException ex) {
-			post( DVProblemEvent.error("Error updating the folder tree ", ex) );
+			post( new VFRTPErrorEvent("Error updating the folder tree ", ex) );
+			System.err.println(ex);
+			ex.printStackTrace();
 		}
 	}
 	@Subscribe

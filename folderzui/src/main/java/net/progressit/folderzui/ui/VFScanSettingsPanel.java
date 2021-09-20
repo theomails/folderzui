@@ -1,5 +1,6 @@
 package net.progressit.folderzui.ui;
 
+import java.awt.Container;
 import java.io.File;
 import java.util.Optional;
 
@@ -30,7 +31,7 @@ public class VFScanSettingsPanel extends PComponent<String, String>{
 	}
 	
 	
-	private PDisplayWindow window;
+	private Container window;
 	private JPanel panel = new JPanel(new MigLayout("insets 1","[]5[grow, fill]10[]5[]","[]"));
 	private PPlacers simplePlacers = new PSimpleContainerPlacers(panel);
 
@@ -39,7 +40,7 @@ public class VFScanSettingsPanel extends PComponent<String, String>{
 	private PSimpleButton btnBrowse = new PSimpleButton( simplePlacers );
 	private PSimpleButton btnScan = new PSimpleButton( simplePlacers );
 
-	public VFScanSettingsPanel(PPlacers placers, PDisplayWindow window) {
+	public VFScanSettingsPanel(PPlacers placers, Container window) {
 		super(placers);
 		this.window = window;
 	}

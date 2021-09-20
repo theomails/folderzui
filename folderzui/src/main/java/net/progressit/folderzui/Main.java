@@ -7,15 +7,13 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
-import net.progressit.folderzui.model.Scanner;
+import net.progressit.folderzui.ui.PDisplayWindow;
 
 public class Main {
 
 
 
 	public static void main(String[] args) throws IOException {
-		final Scanner scanner = new Scanner();
-		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
@@ -25,7 +23,7 @@ public class Main {
 		}
 				
 		SwingUtilities.invokeLater( ()->{
-			DisplayWindow dw = new DisplayWindow(scanner);
+			PDisplayWindow dw = new PDisplayWindow();
 			dw.init();
 			dw.setExtendedState(JFrame.MAXIMIZED_BOTH);
 			dw.setVisible(true);

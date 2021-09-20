@@ -6,7 +6,6 @@ import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.eventbus.EventBus;
@@ -118,7 +117,7 @@ public class SizingFileVisitor implements FileVisitor<Path> {
 			parentDetails.cumulate(curDetails);
 			curDetails = parentDetails;
 		}else {
-			FolderDetails rootFinalDetails = allDetailsContainer.get(dir);
+			//FolderDetails rootFinalDetails = allDetailsContainer.get(dir);
 			//rootFinalDetails.printNested( System.out );
 			
 		}
