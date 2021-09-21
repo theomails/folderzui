@@ -12,29 +12,38 @@ import javax.swing.JPanel;
 
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 
-public class DrawPanel extends JPanel {
+public class UsageDisplayPanel extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	public enum DrawPanelMode { SIZE, COUNT }
 	
-	public static class DPRenderException extends Exception{
+	public static class UDPRenderException extends Exception{
 		private static final long serialVersionUID = 1L;
-		public DPRenderException(String message, Exception sourceException) {
+		public UDPRenderException(String message, Exception sourceException) {
 			super(message, sourceException);
 		}
 	}
 
 	private DrawPanelMode mode;
 	private FolderDetails details=null;
-	public void setDetails(FolderDetails details, DrawPanelMode mode) throws DPRenderException {
+	public void setDetails(FolderDetails details, DrawPanelMode mode) throws UDPRenderException {
 		try {
 			this.mode = mode;
 			this.details = details;
 			this.repaint();
 		}catch(RuntimeException e) {
-			throw new DPRenderException("Error while rendering the folder usage.", e);
+			throw new UDPRenderException("Error while rendering the folder usage.", e);
 		}
 	}
+	
+	@Override
+	public void paintComponent(Graphics g) {
+
+		super.paintComponent(g);
+		doDrawing(g);
+	}
+	
+	//PRIVATE
 	
 	private double scale = 1d;
 	private void doDrawing(Graphics g) {
@@ -45,7 +54,7 @@ public class DrawPanel extends JPanel {
 		if(details==null) return;
 
 		double total = getFullValue(details);
-		double height = DrawPanel.this.getHeight();
+		double height = UsageDisplayPanel.this.getHeight();
 		scale = height / total;
 		drawBox(0d, 0d, 50d, childHeight(details, scale), height(details, scale), fileName(details), g2d); // Root folder fills :)
 		int level = 1;
@@ -77,13 +86,6 @@ public class DrawPanel extends JPanel {
 		if(height>30) g2d.drawString(fileName, (int) x, (int) y+15);
 		g2d.drawRect((int) x, (int) y, (int) width, (int) height);
 		
-	}
-
-	@Override
-	public void paintComponent(Graphics g) {
-
-		super.paintComponent(g);
-		doDrawing(g);
 	}
 
 	@SuppressWarnings("unused")

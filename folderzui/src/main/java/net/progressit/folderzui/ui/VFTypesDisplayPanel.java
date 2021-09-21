@@ -11,43 +11,36 @@ import javax.swing.JScrollPane;
 
 import lombok.Data;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
-import net.progressit.folderzui.swing.UsageDisplayPanel;
-import net.progressit.folderzui.swing.UsageDisplayPanel.UDPRenderException;
-import net.progressit.folderzui.swing.UsageDisplayPanel.DrawPanelMode;
-import net.progressit.folderzui.ui.VFUsageDisplayPanel.VFUDData;
+import net.progressit.folderzui.swing.TypesDisplayPanel;
+import net.progressit.folderzui.swing.TypesDisplayPanel.TDPRenderException;
 import net.progressit.progressive.PComponent;
 
-public class VFUsageDisplayPanel extends PComponent<VFUDData, VFUDData>{
+public class VFTypesDisplayPanel extends PComponent<FolderDetails, FolderDetails>{
 	@Data
-	public static class VFUDData{
-		private final DrawPanelMode mode;
-		private final FolderDetails folderDetails;
-	}
-	@Data
-	public static class VFUDErrorEvent{
+	public static class VFTDErrorEvent{
 		private final Throwable error;
 	}
 	
-	private UsageDisplayPanel drawPanel = new UsageDisplayPanel();
+	private TypesDisplayPanel drawPanel = new TypesDisplayPanel();
 	private JScrollPane spDrawPanel = new JScrollPane(drawPanel);
 
 	
-	public VFUsageDisplayPanel(PPlacers placers) {
+	public VFTypesDisplayPanel(PPlacers placers) {
 		super(placers);
 	}
 
 	@Override
-	protected PDataPeekers<VFUDData> getDataPeekers() {
-		return new PDataPeekers<VFUDData>( (data)->Set.of(data), (data)->Set.of() );
+	protected PDataPeekers<FolderDetails> getDataPeekers() {
+		return new PDataPeekers<FolderDetails>( (data)->Set.of(data), (data)->Set.of() );
 	}
 
 	@Override
-	protected PRenderers<VFUDData> getRenderers() {
-		return new PRenderers<VFUDData>( ()-> spDrawPanel, (data)->{
+	protected PRenderers<FolderDetails> getRenderers() {
+		return new PRenderers<FolderDetails>( ()-> spDrawPanel, (data)->{
 			try {
-				drawPanel.setDetails(data.getFolderDetails(), data.getMode()); //Null is fine
-			} catch (UDPRenderException e) {
-				post( new VFUDErrorEvent(e) );
+				drawPanel.setDetails(data); //Null is fine
+			} catch (TDPRenderException e) {
+				post( new VFTDErrorEvent(e) );
 			}
 		}, (data)->new PChildrenPlan() );
 	}
@@ -60,6 +53,7 @@ public class VFUsageDisplayPanel extends PComponent<VFUDData, VFUDData>{
 				drawPanel.setBorder(BorderFactory.createLineBorder( Color.GRAY ));
 				drawPanel.setBackground(new Color(245,245,245));
 				
+				/* Not much use zooming into types data.
 				spDrawPanel.addMouseWheelListener(new MouseWheelListener() {
 					@Override
 					public void mouseWheelMoved(MouseWheelEvent e) {
@@ -90,6 +84,7 @@ public class VFUsageDisplayPanel extends PComponent<VFUDData, VFUDData>{
 						return input<minLimit?minLimit:input;
 					}
 				});
+				*/
 			}
 			
 			@Override

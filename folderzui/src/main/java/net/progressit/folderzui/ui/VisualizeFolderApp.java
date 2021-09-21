@@ -23,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 import net.miginfocom.swing.MigLayout;
 import net.progressit.folderzui.model.Scanner;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
-import net.progressit.folderzui.swing.DrawPanel.DrawPanelMode;
+import net.progressit.folderzui.swing.UsageDisplayPanel.DrawPanelMode;
 import net.progressit.folderzui.ui.VFResultsTreePanel.VFRTPErrorEvent;
 import net.progressit.folderzui.ui.VFResultsTreePanel.VFRTPFolderClickEvent;
 import net.progressit.folderzui.ui.VFScanSettingsPanel.VFSSPPathChangedEvent;
@@ -48,7 +48,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	private Container window;
 	//My swing
 	private JPanel pnlMain = new JPanel(new BorderLayout()); //export
-	private JPanel pnlResults = new JPanel(new MigLayout("insets 0","[300::, grow 300, fill]5[400::,grow 600, fill]","10[grow, fill]10"));
+	private JPanel pnlResults = new JPanel(new MigLayout("insets 0","[300::, grow 300, fill]5[400::,grow 600, fill][50::, fill]","10[grow, fill]10"));
 	
 	//Progressive support
 	private PPlacers mainNorthPlacementHandler = new PPlacers( (component)->pnlMain.add(component, BorderLayout.NORTH), (component)->pnlMain.remove(component) );
@@ -57,7 +57,8 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 	//Progressive
 	private VFScanSettingsPanel settingsPanel = new VFScanSettingsPanel(mainNorthPlacementHandler, window);
 	private VFResultsTreePanel treePanel = new VFResultsTreePanel(resultsPlacementHandler);
-	private VFUsageDisplayOptionsPanel usageOptionsPanel = new VFUsageDisplayOptionsPanel(resultsPlacementHandler);
+	private VFUsageDisplayOptionsPanel usageWithOptionsPanel = new VFUsageDisplayOptionsPanel(resultsPlacementHandler);
+	private VFTypesDisplayPanel typeDisplayPanel = new VFTypesDisplayPanel(resultsPlacementHandler);
 	private VFStatusPanel statusPanel = new VFStatusPanel(mainSouthPlacementHandler);
 	
 	//STATE
@@ -120,8 +121,13 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 			} )).build();
 			plans.addChildPlan(plan);
 			
-			plan = PChildPlan.builder().component(usageOptionsPanel).props(data.usageOptionsData).listener(Optional.of( new PEventListener() {
-				//Need to listen to mouse motion
+			plan = PChildPlan.builder().component(usageWithOptionsPanel).props(data.usageOptionsData).listener(Optional.of( new PEventListener() {
+				//Need to listen to render error
+			} )).build();
+			plans.addChildPlan(plan);
+			
+			plan = PChildPlan.builder().component(typeDisplayPanel).props(data.usageOptionsData.getFolderDetails()).listener(Optional.of( new PEventListener() {
+				//Need to listen to render error
 			} )).build();
 			plans.addChildPlan(plan);
 			

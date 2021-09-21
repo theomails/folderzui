@@ -13,7 +13,7 @@ import com.google.common.eventbus.Subscribe;
 import lombok.Builder;
 import lombok.Data;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
-import net.progressit.folderzui.swing.DrawPanel.DrawPanelMode;
+import net.progressit.folderzui.swing.UsageDisplayPanel.DrawPanelMode;
 import net.progressit.folderzui.ui.VFUsageDisplayOptionsPanel.VFUDOData;
 import net.progressit.folderzui.ui.VFUsageDisplayPanel.VFUDData;
 import net.progressit.folderzui.ui.VFUsageDisplayPanel.VFUDErrorEvent;
