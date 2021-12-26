@@ -1,9 +1,6 @@
 package net.progressit.folderzui.ui;
 
 import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.util.Set;
 
 import javax.swing.BorderFactory;
