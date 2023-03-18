@@ -1,10 +1,11 @@
 package net.progressit.folderzui.ui;
 
 import java.awt.Color;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
+
+import com.google.common.collect.Sets;
 
 import lombok.Data;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
@@ -28,7 +29,7 @@ public class VFTypesDisplayPanel extends PComponent<FolderDetails, FolderDetails
 
 	@Override
 	protected PDataPeekers<FolderDetails> getDataPeekers() {
-		return new PDataPeekers<FolderDetails>( (data)->Set.of(data), (data)->Set.of() );
+		return new PDataPeekers<FolderDetails>( (data)->Sets.newHashSet(data), (data)->Sets.newHashSet() );
 	}
 
 	@Override

@@ -5,7 +5,6 @@ import java.awt.event.MouseEvent;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
@@ -17,6 +16,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.MutableTreeNode;
 import javax.swing.tree.TreePath;
 
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import lombok.Builder;
@@ -93,7 +93,7 @@ public class VFResultsTreePanel extends PComponent<Path, Path>{
 
 	@Override
 	protected PDataPeekers<Path> getDataPeekers() {
-		return new PDataPeekers<Path>( (data)->Set.of( data ), (data)->Set.of() );
+		return new PDataPeekers<Path>( (data)->Sets.newHashSet( data ), (data)->Sets.newHashSet() );
 	}
 
 	@Override

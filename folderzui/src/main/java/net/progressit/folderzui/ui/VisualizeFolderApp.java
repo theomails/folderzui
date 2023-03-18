@@ -9,12 +9,12 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import lombok.Builder;
@@ -76,7 +76,7 @@ public class VisualizeFolderApp extends PComponent<VisualizeFolderAppData, Strin
 
 	@Override
 	protected PDataPeekers<VisualizeFolderAppData> getDataPeekers() {
-		return new PDataPeekers<VisualizeFolderAppData>( (data)->Set.of(), (data)->Set.of(data) );
+		return new PDataPeekers<VisualizeFolderAppData>( (data)->Sets.newHashSet(), (data)->Sets.newHashSet(data) );
 	}
 
 	@Override

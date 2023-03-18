@@ -4,16 +4,17 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JScrollPane;
 
+import com.google.common.collect.Sets;
+
 import lombok.Data;
 import net.progressit.folderzui.model.Scanner.FolderDetails;
 import net.progressit.folderzui.swing.UsageDisplayPanel;
-import net.progressit.folderzui.swing.UsageDisplayPanel.UDPRenderException;
 import net.progressit.folderzui.swing.UsageDisplayPanel.DrawPanelMode;
+import net.progressit.folderzui.swing.UsageDisplayPanel.UDPRenderException;
 import net.progressit.folderzui.ui.VFUsageDisplayPanel.VFUDData;
 import net.progressit.progressive.PComponent;
 
@@ -38,7 +39,7 @@ public class VFUsageDisplayPanel extends PComponent<VFUDData, VFUDData>{
 
 	@Override
 	protected PDataPeekers<VFUDData> getDataPeekers() {
-		return new PDataPeekers<VFUDData>( (data)->Set.of(data), (data)->Set.of() );
+		return new PDataPeekers<VFUDData>( (data)->Sets.newHashSet(data), (data)->Sets.newHashSet() );
 	}
 
 	@Override

@@ -1,13 +1,13 @@
 package net.progressit.folderzui.ui;
 
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.JLabel;
 import javax.swing.JTabbedPane;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
+import com.google.common.collect.Sets;
 import com.google.common.eventbus.Subscribe;
 
 import lombok.Builder;
@@ -40,7 +40,8 @@ public class VFUsageDisplayOptionsPanel extends PComponent<VFUDOData, VFUDOData>
 
 	@Override
 	protected PDataPeekers<VFUDOData> getDataPeekers() {
-		return new PDataPeekers<VFUDOData>( (data)->Set.of(data.getSelectedMode()), (data)->Set.of(data.getFolderDetails()==null?new Object():data.getFolderDetails()) );
+		return new PDataPeekers<VFUDOData>( (data)->Sets.newHashSet(data.getSelectedMode()), 
+				(data)->Sets.newHashSet(data.getFolderDetails()==null?new Object():data.getFolderDetails()) );
 	}
 
 	@Override
